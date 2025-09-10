@@ -1,0 +1,249 @@
+[
+  {
+    "tarot": "The Fool",
+    "archetype": "Rebecca Respawn — Weaver",
+    "letter": "Aleph",
+    "sephira": "Malkuth → Kether bridge (entry)",
+    "astrology": "0–3° Aries slice",
+    "ray": 7,
+    "freq_hz": 963,
+    "pigment": "Lapis Lazuli",
+    "crystal": "Clear Quartz",
+    "artifact": "Spiral Key",
+    "psyche": {"wound":"rejection","medicine":"curiosity","daemon":"white fox"},
+    "triple_key": {
+      "master": "Octarine Fusionist (You)",
+      "shem": {"angel":"Vehuiah","daemon":"Bael","ladder_ref":"Ladder: Rung 1·Seed"},
+      "tara": {"name":"White Tara","mantra":"OM TARE TUTTARE TURE SOHA","color":"pearl/white"}
+    },
+    "gameplay": {
+      "hall": "Respawn Gate (Spiral Atelier)",
+      "atelier_tasks": [
+        "Sketch the Aleph air spiral until mirror latency = calm",
+        "Collage ‘beginnings’: artifact + pigment + crystal"
+      ],
+      "puzzle_trial": "Breath-count walk across swinging bridge (timed, ND-safe)",
+      "witch_mode": "Respawn Gate — on fail, spawn a new discovery room instead of death"
+    },
+    "links": ["docs://LIBER-ARCANAE-FULL-NOTES/Fool","docs://CODEX-14499/Fool","open://Praises_of_21_Taras"],
+    "safety":{"nd_safe":true,"notes":"No strobe, soft audio opt-in"},
+    "provenance": ["Your Living Tarot Master Files & Codex 144:99"]
+  },
+
+  {
+    "tarot": "The Tower / Aeon",
+    "archetype": "Aleister Crowley — Catalyst",
+    "letter": "Pe",
+    "sephira": "Hod ↔ Netzach shock canal",
+    "astrology": "Mars arc / mid Aries",
+    "ray": 5,
+    "freq_hz": 528,
+    "pigment": "Vermilion",
+    "crystal": "Obsidian",
+    "artifact": "Unicursal Hexagram",
+    "psyche": {"wound":"ego-collapse","medicine":"true will"},
+    "triple_key": {
+      "master": "Thelema (Crowley)",
+      "shem": {"angel":"Lauviah","daemon":"Belial","ladder_ref":"Ladder: Shock Traverse"},
+      "tara": {"name":"Red Tara","mantra":"OM TARE TAM SOHA","color":"red"}
+    },
+    "gameplay": {
+      "hall": "Catalyst Tower Nave",
+      "atelier_tasks": [
+        "Paint a ‘before/after’ diptych of a crumbling tower",
+        "Compose a 4-stroke glyph that resolves chaos"
+      ],
+      "puzzle_trial": "Align Aeon spiral plates to discharge static build safely",
+      "witch_mode": "Aeon Spiral — collapse one locked map layer and respawn it new"
+    },
+    "links": ["open://Liber_AL","open://Book_of_Thoth"],
+    "safety":{"nd_safe":true,"notes":"Haptic rumble ≤ low; no flashing"},
+    "provenance": ["Your Crowley Aeon file; Codex mappings"]
+  },
+
+  {
+    "tarot": "High Priestess",
+    "archetype": "Dion Fortune — Protector",
+    "letter": "Gimel",
+    "sephira": "Yesod ↔ Tiphareth lunar bridge",
+    "astrology": "Moon/Cancer stream",
+    "ray": 2,
+    "freq_hz": 852,
+    "pigment": "Silver",
+    "crystal": "Moonstone",
+    "artifact": "Veil of Isis",
+    "psyche": {"wound":"psychic invasion","medicine":"boundaries"},
+    "triple_key": {
+      "master": "Avalon/Inner Light (Fortune)",
+      "shem": {"angel":"Haaiah","daemon":"Naamah","ladder_ref":"Ladder: Dream Gate"},
+      "tara": {"name":"Green Tara","mantra":"OM TARE TUTTARE TURE SOHA","color":"green"}
+    },
+    "gameplay": {
+      "hall": "Moon Temple (Avalon Spiral)",
+      "atelier_tasks": [
+        "Ink a moon-veil texture over mirror until silhouette softens",
+        "Design a boundary sigil then place it as a tile"
+      ],
+      "puzzle_trial": "Mist corridor navigation by sound-only chimes (soft)",
+      "witch_mode": "Moon Temple — party-wide psychic shield 3 turns"
+    },
+    "links": ["open://Mystical_Qabalah","docs://fortune_avalon_matrix"],
+    "safety":{"nd_safe":true,"notes":"Volume-limited chimes; motion = slow mist"},
+    "provenance": ["Your Avalon notes & Spiral generator"]
+  },
+
+  {
+    "tarot": "The Hanged Man",
+    "archetype": "Frater Achad — Inverter",
+    "letter": "Mem",
+    "sephira": "Da’ath (hidden bridge)",
+    "astrology": "Neptune/Water resonance",
+    "ray": 4,
+    "freq_hz": 741,
+    "pigment": "Indigo",
+    "crystal": "Opal",
+    "artifact": "Maat Feather",
+    "psyche": {"wound":"paradox lost","medicine":"balance"},
+    "triple_key": {
+      "master": "Maatian Qabalah (Achad)",
+      "shem": {"angel":"Reiyel","daemon":"Agares","ladder_ref":"Ladder: Paradox Span"},
+      "tara": {"name":"Blue Tara","mantra":"OM TARE BHYURKA SOHA","color":"blue"}
+    },
+    "gameplay": {
+      "hall": "Da’ath Mirror Crypt",
+      "atelier_tasks": [
+        "Reverse-draw your name as a mirrored sigil",
+        "Balance feather-stones on a beam sculpture"
+      ],
+      "puzzle_trial": "Walk the inverted bridge (optional reverse controls)",
+      "witch_mode": "Mirror Tesseract — invert one enemy/puzzle rule"
+    },
+    "links": ["open://Liber_31","docs://achad_daath_paths"],
+    "safety":{"nd_safe":true,"notes":"Reverse-controls toggle OFF by default"},
+    "provenance": ["Your Achad paradox notes"]
+  },
+
+  {
+    "tarot": "The Magician",
+    "archetype": "Agrippa — Synthesizer",
+    "letter": "Beth",
+    "sephira": "Hod (Hermetic lab)",
+    "astrology": "Mercury/Virgo",
+    "ray": 3,
+    "freq_hz": 396,
+    "pigment": "Copper Green",
+    "crystal": "Quicksilver (symbolic)",
+    "artifact": "Planetary Orrery",
+    "psyche": {"wound":"fragmentation","medicine":"coherence"},
+    "triple_key": {
+      "master": "Hermetic Natural Magic (Agrippa)",
+      "shem": {"angel":"Nith-Haiah","daemon":"Asmodai","ladder_ref":"Ladder: Sevenfold Gate"},
+      "tara": {"name":"Yellow Tara","mantra":"OM TARE TUTTARE TURE PUSHTIM KURU SOHA","color":"yellow"}
+    },
+    "gameplay": {
+      "hall": "Orrery Dome (Planetary Atelier)",
+      "atelier_tasks": [
+        "Ink a heptagram virtue wheel with metal glyphs",
+        "Assemble a 4-element collage that ‘breathes’"
+      ],
+      "puzzle_trial": "Open the hour-gate at correct planetary timing (UI clock hint)",
+      "witch_mode": "Planetary Ally — summon one elemental helper"
+    },
+    "links": ["open://De_Occulta_Philosophia"],
+    "safety":{"nd_safe":true,"notes":"Timing window generous; no countdown stressors"},
+    "provenance": ["Your Agrippa planetary engine file"]
+  },
+
+  {
+    "tarot": "Temperance",
+    "archetype": "Paul Foster Case — Harmonizer",
+    "letter": "Samekh",
+    "sephira": "Yesod ↔ Tiphareth span",
+    "astrology": "Sagittarius/Path Samekh",
+    "ray": 6,
+    "freq_hz": 417,
+    "pigment": "Prismatic Glass",
+    "crystal": "Amethyst",
+    "artifact": "Cube of Space",
+    "psyche": {"wound":"discord","medicine":"harmony"},
+    "triple_key": {
+      "master": "B.O.T.A. (Paul Foster Case)",
+      "shem": {"angel":"Mebahiah","daemon":"Belphegor","ladder_ref":"Ladder: Harmony Span"},
+      "tara": {"name":"Orange Tara","mantra":"OM TARE TUTTARE TURE ... (vitality form)","color":"orange"}
+    },
+    "gameplay": {
+      "hall": "Prismatic Nave & Cube",
+      "atelier_tasks": [
+        "Blend two paints to a third and map to a tone",
+        "Arrange Hebrew letter arches to tune the nave"
+      ],
+      "puzzle_trial": "Play the chord that unlocks the Cube door",
+      "witch_mode": "Temper — fuse two party skills into one hybrid"
+    },
+    "links": ["open://BOTA_notes","docs://pfcase_cube_harmonics"],
+    "safety":{"nd_safe":true,"notes":"Audio opt-in; single-tone cues only"},
+    "provenance": ["Your Case prismatic nave spec"]
+  },
+
+  {
+    "tarot": "Justice",
+    "archetype": "Stephen Skinner — Transmitter",
+    "letter": "Lamed",
+    "sephira": "Geburah (courts of balance)",
+    "astrology": "Libra",
+    "ray": 1,
+    "freq_hz": 639,
+    "pigment": "Sky Grey",
+    "crystal": "Fluorite",
+    "artifact": "Geomantic Compass",
+    "psyche": {"wound":"gatekeeping","medicine":"sharing"},
+    "triple_key": {
+      "master": "Angelic/Geomantic Science (Skinner)",
+      "shem": {"angel":"Umabel","daemon":"Marchosias","ladder_ref":"Ladder: Balance Court"},
+      "tara": {"name":"Indigo Tara","mantra":"ND-safe compassion mantra","color":"indigo"}
+    },
+    "gameplay": {
+      "hall": "Angelic Justice Dome",
+      "atelier_tasks": [
+        "Stamp 16 geomantic figures into a floor-plan",
+        "Rebuild a Watchtower name lattice (drag-letters)"
+      ],
+      "puzzle_trial": "Bind breach with an oath-circle (draw simple circle UI)",
+      "witch_mode": "Oath — suppress one enemy ability for 3 turns"
+    },
+    "links": ["open://Key_of_Solomon","open://Enochian_Tables"],
+    "safety":{"nd_safe":true,"notes":"Language puzzles, no forced conjurations"},
+    "provenance": ["Your Skinner angelic geomancy pack"]
+  },
+
+  {
+    "tarot": "The Star",
+    "archetype": "Tara Lineage — Healer",
+    "letter": "Tzaddi (bridge use)",
+    "sephira": "Netzach (compassion flow)",
+    "astrology": "Aquarius",
+    "ray": 8,
+    "freq_hz": 528,
+    "pigment": "Turquoise",
+    "crystal": "Aquamarine",
+    "artifact": "Antahkarana Bridge",
+    "psyche": {"wound":"despair","medicine":"mercy"},
+    "triple_key": {
+      "master": "21 Taras / Reiki Bridge",
+      "shem": {"angel":"Anauel","daemon":"Gamigin","ladder_ref":"Ladder: Healing Span"},
+      "tara": {"name":"All 21 Taras","mantra":"(per emanation)","color":"21-ring palette"}
+    },
+    "gameplay": {
+      "hall": "Compassion Mandala Dome",
+      "atelier_tasks": [
+        "Trace Cho Ku Rei spiral as floor inlay",
+        "Align three seed syllables to light a Tara triad"
+      ],
+      "puzzle_trial": "Sequence 3 emanations to dissolve a curse (UI tiles)",
+      "witch_mode": "Compassion Field — party heal + remove 1 trauma-state"
+    },
+    "links": ["open://Praises_of_21_Taras","docs://tara21_compassion_labs"],
+    "safety":{"nd_safe":true,"notes":"No chanting required; click-to-emit soft drones"},
+    "provenance": ["Your Tara 21 + Reiki symbol set"]
+  }
+]
