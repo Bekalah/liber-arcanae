@@ -34,4 +34,5 @@ Everything runs offline.
 - No motion or flashing; all elements render statically in layer order.
 - Palette uses gentle contrast for readability.
 - Pure functions, ES modules, UTF-8, and LF newlines.
+- Palette file can be edited offline to adjust hues; the page falls back to built-in colors if it's missing.
 
