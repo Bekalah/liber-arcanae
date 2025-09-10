@@ -12,8 +12,18 @@ Static, ND-safe HTML5 canvas renderer for layered sacred geometry. Open [index.h
 
 Each layer uses the next color from [`data/palette.json`](./data/palette.json). If the palette file is missing, a safe fallback loads and a small notice appears.
 
-## Numerology
-Geometry routines reference sacred numbers 3, 7, 9, 11, 22, 33, 99, and 144 to keep proportions meaningful while staying static.
+## Numerology as Spiral Grammar
+The constants of the Cathedral are Fibonacci-coded checkpoints rather than flat decoration:
+
+- **21 pillars** – a Fibonacci node (8 + 13) aligning to Tarot majors and 21 Taras.
+- **33 spine** – triple elevens forming the Christic ladder.
+- **72 Shem angels/demons** – lunar decan cycle (8 × 9).
+- **78 archetypes** – complete Tarot weave (22 + 56).
+- **99 gates** – threefold expansion of the spine (3 × 33).
+- **144 lattice** – perfect square of 12 and 8th Fibonacci.
+- **243 completion** – fivefold power of the triad (3⁵).
+
+Geometry routines in this renderer reference sacred numbers 3, 7, 9, 11, 22, 33, 99, and 144 to keep proportions meaningful while staying static.
 
 ## Local Use
 Double-click [index.html](./index.html) in any modern browser. The 1440×900 canvas renders immediately with no network calls.
