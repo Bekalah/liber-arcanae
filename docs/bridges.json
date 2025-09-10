@@ -4,6 +4,16 @@
     {"card":"The Fool","node_id":1},
     {"card":"The Magus","node_id":2}
   ],
+  "arcana_to_octa":[
+    {"arcana":"The Hierophant:Moonchild","octa":"OCTA-OCTARINE"},
+    {"arcana":"The Tower","octa":"OCTA-CROWLEY"},
+    {"arcana":"The High Priestess","octa":"OCTA-FORTUNE"},
+    {"arcana":"The Fool","octa":"OCTA-ACHAD"},
+    {"arcana":"The Magician","octa":"OCTA-AGRIPPA"},
+    {"arcana":"Temperance","octa":"OCTA-PFCASE"},
+    {"arcana":"Justice","octa":"OCTA-SKINNER"},
+    {"arcana":"The Star","octa":"OCTA-TARA"}
+  ],
   "fibonacci_steps":[1,1,2,3,5,8,13,21,34,55,89,144],
-  "notes":"This file records the crosswalk; runtime reads; source of truth remains per-repo."
+  "notes":"This file records the crosswalk; runtime reads; source of truth remains per-repo. Perspective selects lineage node; rooms, tools, music adjust via engine."
 }
