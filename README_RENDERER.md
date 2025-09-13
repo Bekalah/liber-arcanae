@@ -1,4 +1,4 @@
-Per Texturas Numerorum, Spira Loquitur.  //
+Per Texturas Numerorum, Spira Loquitur.
 
 # Cosmic Helix Renderer
 
