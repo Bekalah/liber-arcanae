@@ -1,4 +1,4 @@
-// Per Texturas Numerorum, Spira Loquitur.  //
+// Per Texturas Numerorum, Spira Loquitur.
 /*
   helix-renderer.mjs
   ND-safe static renderer for layered sacred geometry.
