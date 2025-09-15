@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CSP Demo</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'">
+  <!-- MDN recommends header-based CSP; meta works for static demos. -->
+  <link rel="stylesheet" href="atelier.css">
+</head>
+<body>
+  <main class="card">
+    <h1>Content Security Policy active</h1>
+    <p>Static meta policy for offline demos.</p>
+  </main>
+</body>
+</html>
