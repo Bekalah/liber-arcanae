@@ -1,24 +1,19 @@
-# liber-arcanae
-```
-            /\                     /\
-           /  \      /\   /\      /  \
-          / /\ \    /  \ /  \    / /\ \
-         / /  \ \  / /\ V /\ \  / /  \ \
-        /_/    \_\/ /  > <  \_\/_/    \_\
-        \ \    / /\/__/   \__/\ \    / /
-         \ \  / /    /\ /\    \ \  / /
-          \_\/_/    /  V  \    \_\/_/
-           /\\ \   / /\ /\ \   / /\\
-          / /\ \\ / /  V  \ \\// /\ \
-         /_/  \_\/\/       \/_/  \_\
-```
+# Cathedral of Circuits Modular Foundation
 
-living tarot repo that connects to the other apps
+## Structure
+- `index.html`: Main entry point, loads nodes from `/data/nodes.json`.
+- `/data/nodes.json`: All "nodes" (cards, labs, lore) as modular JSON objects.
+- `/img/`: Art and icons for each node.
+- `/labs/`: Each node's interactive lab (HTML mini-apps).
+- `/js/loadNodes.js`: Loads nodes and builds the UI.
+- `style.css`: Styles the site.
 
-## Examples
-- `visionary_dream.py` – generates a unique visionary art image saved with a timestamped filename.
-- `immersive_room.py` – demonstrates an exploratory room rendered with Pygame, including simple art and looping audio.
-- [Cosmic Helix Renderer](./README_RENDERER.md) – static, ND-safe HTML+Canvas scene; open [index.html](./index.html) offline.
+## How to Add Content
+- Add a new node to `/data/nodes.json`.
+- (Optional) Add art to `/img/`.
+- (Optional) Add a lab to `/labs/`.
+- All logic is modular - just update JSON, no code changes needed!
 
-## Development helpers
-Run `node tools/dedupe-lines.mjs` to remove accidental duplicate lines. To automate, copy `tools/pre-commit` to `.git/hooks/pre-commit`.
+## Safety
+- Commit often and push to GitHub to avoid data loss.
+- Keep everything modular for easy recovery and expansion.
