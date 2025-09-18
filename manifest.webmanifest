@@ -1,0 +1,23 @@
+{
+  "name": "Liber Arcanae Pantheon Atlas",
+  "short_name": "Arcanae",
+  "description": "Offline-first pantheon explorer grounded in Codex 144:99.",
+  "lang": "en",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#120c1f",
+  "theme_color": "#6c5ba7",
+  "icons": [
+    {
+      "src": "img/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

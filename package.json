@@ -7,7 +7,8 @@
     "test": "node tests/interface.test.js",
     "optimize": "node scripts/optimize.mjs",
     "dupes": "node scripts/dupes.mjs",
-    "validate:assets": "ajv -s schemas/asset.schema.json -d assets/ASSET_CATALOG.json --spec=draft2020"
+    "validate:assets": "ajv -s schemas/asset.schema.json -d assets/ASSET_CATALOG.json --spec=draft2020",
+    "build": "node scripts/build.mjs"
   },
   "devDependencies": {
     "ajv-cli": "^5.0.0",
