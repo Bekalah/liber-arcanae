@@ -1,13 +1,218 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <title>Cathedral of Circuits</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="utf-8">
+  <title>Cosmic Helix Renderer (ND-safe, Offline)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <style>
+    /* ND-safe: calm contrast, no motion, generous spacing */
+    :root { --bg:#0b0b12; --ink:#e8e8f0; --muted:#a6a6c1; --outline:#1d1d2a; }
+    body { margin:0; padding:0; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+    body.calm-mode { --bg:#080812; --ink:#f3f3fa; --muted:#c0c0dd; --outline:#27273c; }
+    a { color:inherit; }
+    .skip-link { position:absolute; left:-999px; top:auto; width:1px; height:1px; overflow:hidden; }
+    .skip-link:focus { left:16px; top:12px; width:auto; height:auto; padding:8px 12px; background:#1d1d2a; color:#f0f0ff; border-radius:6px; z-index:1000; text-decoration:none; }
+    header { padding:12px 16px; border-bottom:1px solid var(--outline); display:flex; flex-direction:column; gap:8px; }
+    .header-title { margin:0; font-size:16px; font-weight:600; }
+    .controls { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+    .status { color:var(--muted); font-size:12px; }
+    .calm-button { border:1px solid var(--outline); background:transparent; color:var(--ink); padding:6px 12px; border-radius:6px; font:inherit; cursor:pointer; }
+    .calm-button:hover,.calm-button:focus-visible { border-color:var(--muted); outline:none; }
+    .calm-button[aria-pressed="true"] { background:rgba(45,45,70,0.35); }
+    .calm-button:disabled { opacity:0.6; cursor:not-allowed; }
+    main { padding:16px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+    #stage { display:block; margin:0 auto; box-shadow:0 0 0 1px var(--outline); background:var(--bg); }
+    .note { max-width:900px; margin:0 auto 16px; color:var(--muted); }
+    code { background:#11111a; padding:2px 4px; border-radius:3px; }
+  </style>
 </head>
 <body>
-  <h1>Cathedral of Circuits</h1>
-  <div id="node-list"></div>
-  <script src="js/loadNodes.js"></script>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <h1 class="header-title">Cosmic Helix Renderer — layered sacred geometry (offline, ND-safe)</h1>
+    <div class="controls">
+      <button type="button" id="calm-toggle" class="calm-button" aria-pressed="false">Calm Mode</button>
+      <span class="status" id="status" role="status" aria-live="polite">Loading palette…</span>
+    </div>
+  </header>
+
+  <main id="main">
+    <canvas id="stage" width="1440" height="900" aria-label="Layered sacred geometry canvas" role="img"></canvas>
+    <p class="note">This static renderer encodes Vesica, Tree-of-Life, Fibonacci, and a static double-helix lattice. No animation, no autoplay, no external libraries. Open this file directly.</p>
+  </main>
+
+  <script type="module">
+    import { renderHelix } from "./js/helix-renderer.mjs";
+
+    const elStatus = document.getElementById("status");
+    const canvas = document.getElementById("stage");
+    const calmToggle = document.getElementById("calm-toggle");
+    const ctx = canvas.getContext("2d");
+    const body = document.body;
+
+    const defaults = {
+      palette: {
+        bg:"#0b0b12",
+        ink:"#e8e8f0",
+        layers:["#b1c7ff","#89f7fe","#a0ffa1","#ffd27f","#f5a3ff","#d0d0e6"]
+      }
+    };
+
+    const NUM = {
+      THREE:3,
+      SEVEN:7,
+      NINE:9,
+      ELEVEN:11,
+      TWENTYTWO:22,
+      THIRTYTHREE:33,
+      NINETYNINE:99,
+      ONEFORTYFOUR:144
+    };
+
+    if (!ctx) {
+      elStatus.textContent = "Canvas context unavailable; static illustration cannot render.";
+      calmToggle.disabled = true;
+      calmToggle.setAttribute("aria-disabled", "true");
+    } else {
+      setupRenderer();
+    }
+
+    async function setupRenderer() {
+      const paletteData = await loadJSON("./data/palette.json");
+      const palette = sanitizePalette(paletteData, defaults.palette);
+      const paletteMessage = paletteData ? "Palette loaded." : "Palette missing; using safe fallback.";
+      const palettes = { active: palette, calm: createCalmPalette(palette) };
+      const calmState = createCalmState({
+        body,
+        button: calmToggle,
+        statusEl: elStatus,
+        ctx,
+        canvas,
+        palettes,
+        baseMessage: paletteMessage,
+        NUM
+      });
+      calmState.init();
+    }
+
+    async function loadJSON(path) {
+      try {
+        const res = await fetch(path, { cache:"no-store" });
+        if (!res.ok) throw new Error(String(res.status));
+        return await res.json();
+      } catch (err) {
+        return null; // Offline-first: fall back quietly
+      }
+    }
+
+    function sanitizePalette(input, fallback) {
+      if (!input || typeof input !== "object") return clonePalette(fallback);
+      const safe = {
+        bg:isHex(input.bg) ? input.bg : fallback.bg,
+        ink:isHex(input.ink) ? input.ink : fallback.ink,
+        layers:Array.isArray(input.layers) ? input.layers.filter(isHex) : []
+      };
+      const needed = fallback.layers.length;
+      while (safe.layers.length < needed) {
+        safe.layers.push(fallback.layers[safe.layers.length % fallback.layers.length]);
+      }
+      safe.layers = safe.layers.slice(0, needed);
+      return safe;
+    }
+
+    function clonePalette(palette) {
+      return { bg:palette.bg, ink:palette.ink, layers:palette.layers.slice() };
+    }
+
+    function createCalmPalette(base) {
+      // ND-safe: soften hues without removing contrast
+      return {
+        bg:mixHex(base.bg, base.ink, 0.08),
+        ink:base.ink,
+        layers:base.layers.map(layer => mixHex(layer, base.ink, 0.25))
+      };
+    }
+
+    function createCalmState({ body, button, statusEl, ctx, canvas, palettes, baseMessage, NUM }) {
+      let calmActive = false;
+      let manualOverride = false;
+      const media = typeof window.matchMedia === "function"
+        ? window.matchMedia("(prefers-reduced-motion: reduce)")
+        : { matches:false };
+
+      const apply = (state, source) => {
+        calmActive = state;
+        body.classList.toggle("calm-mode", state);
+        button.setAttribute("aria-pressed", state ? "true" : "false");
+        const calmNote = state ? " Calm Mode active for softer palette." : " Calm Mode ready (toggle for softer palette).";
+        let origin = "";
+        if (source === "manual") origin = " Manual override engaged.";
+        if (source === "sync") origin = " Manual override cleared; synced with system preference.";
+        if (source === "preference" && state) origin = " Honoring system calm preference.";
+        statusEl.textContent = baseMessage + calmNote + origin;
+        renderHelix(ctx, {
+          width:canvas.width,
+          height:canvas.height,
+          palette: state ? palettes.calm : palettes.active,
+          NUM
+        });
+      };
+
+      const handlePreference = event => {
+        if (manualOverride) return; // Respect user toggle
+        apply(event.matches, "preference");
+      };
+
+      const init = () => {
+        apply(media.matches, "preference");
+        button.addEventListener("click", () => {
+          const nextState = !calmActive;
+          manualOverride = nextState !== media.matches;
+          const source = manualOverride ? "manual" : "sync";
+          apply(nextState, source);
+        });
+        if (typeof media.addEventListener === "function") {
+          media.addEventListener("change", handlePreference);
+        } else if (typeof media.addListener === "function") {
+          media.addListener(handlePreference);
+        }
+      };
+
+      return { init };
+    }
+
+    function isHex(value) {
+      return typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value);
+    }
+
+    function mixHex(hexA, hexB, weight) {
+      const a = hexToRgb(hexA);
+      const b = hexToRgb(hexB);
+      const w = clamp(weight, 0, 1);
+      const blended = {
+        r:Math.round(a.r * (1 - w) + b.r * w),
+        g:Math.round(a.g * (1 - w) + b.g * w),
+        b:Math.round(a.b * (1 - w) + b.b * w)
+      };
+      return rgbToHex(blended);
+    }
+
+    function hexToRgb(hex) {
+      const clean = hex.replace("#", "");
+      const r = parseInt(clean.slice(0, 2), 16);
+      const g = parseInt(clean.slice(2, 4), 16);
+      const b = parseInt(clean.slice(4, 6), 16);
+      return { r:Number.isNaN(r) ? 0 : r, g:Number.isNaN(g) ? 0 : g, b:Number.isNaN(b) ? 0 : b };
+    }
+
+    function rgbToHex({ r, g, b }) {
+      return "#" + [r, g, b].map(v => clamp(v, 0, 255).toString(16).padStart(2, "0")).join("");
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+  </script>
 </body>
 </html>
