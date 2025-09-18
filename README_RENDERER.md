@@ -32,7 +32,8 @@ Everything runs offline.
 
 ## ND-safe Notes
 - No motion or flashing; all elements render statically in layer order.
-- Palette uses gentle contrast for readability.
+- Palette uses gentle contrast for readability, with Calm Mode softening hues when toggled or when the OS requests reduced motion.
+- Skip link, `<main>` landmark, and status messaging keep the page navigable by keyboard and assistive tech.
 - Pure functions, ES modules, UTF-8, and LF newlines.
-- Palette file can be edited offline to adjust hues; the page falls back to built-in colors if it's missing.
+- Palette file can be edited offline to adjust hues; the page falls back to built-in colors if it's missing and surfaces a small inline notice.
 

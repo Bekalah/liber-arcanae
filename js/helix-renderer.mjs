@@ -56,24 +56,26 @@ function drawTreeOfLife(ctx, w, h, color, NUM) {
   ctx.fillStyle = color;
   ctx.lineWidth = 1; // ND-safe: thin lines keep focus soft
 
+  const verticalStep = h / NUM.TWENTYTWO;
   const nodes = [
-    [w / 2, h * 0.05],
-    [w * 0.3, h * 0.18],
-    [w * 0.7, h * 0.18],
-    [w * 0.3, h * 0.35],
-    [w * 0.7, h * 0.35],
-    [w / 2, h * 0.5],
-    [w * 0.3, h * 0.65],
-    [w * 0.7, h * 0.65],
-    [w / 2, h * 0.8],
-    [w / 2, h * 0.95]
+    [w / 2, verticalStep * 1],
+    [w * 0.3, verticalStep * 4],
+    [w * 0.7, verticalStep * 4],
+    [w * 0.3, verticalStep * 7],
+    [w * 0.7, verticalStep * 7],
+    [w / 2, verticalStep * 11],
+    [w * 0.3, verticalStep * 14],
+    [w * 0.7, verticalStep * 14],
+    [w / 2, verticalStep * 18],
+    [w / 2, verticalStep * 21]
   ];
 
-  const paths = [
+  const rawPaths = [
     [0,1],[0,2],[1,2],[1,3],[2,4],[3,4],[3,5],[4,5],[3,6],[4,7],
     [5,6],[5,7],[6,7],[6,8],[7,8],[6,9],[7,9],[8,9],[1,5],[2,5],
     [0,5],[5,9]
-  ]; // 22 paths honoring NUM.TWENTYTWO
+  ];
+  const paths = rawPaths.slice(0, NUM.TWENTYTWO);
 
   for (const [a, b] of paths) {
     const [ax, ay] = nodes[a];
@@ -84,7 +86,8 @@ function drawTreeOfLife(ctx, w, h, color, NUM) {
     ctx.stroke();
   }
 
-  const r = NUM.NINE; // gentle node radius
+  const radiusDivisor = (NUM.TWENTYTWO * NUM.NINE) / NUM.THREE; // 66 via triadic scaling
+  const r = Math.min(w, h) / radiusDivisor; // gentle node radius stays tied to the 22-path framework
   for (const [x, y] of nodes) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -113,7 +116,7 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
 // Layer 4: Static double-helix lattice
 function drawHelixLattice(ctx, w, h, color, NUM) {
   const steps = NUM.ONEFORTYFOUR; // 144 vertical steps
-  const amp = h / NUM.NINE;
+  const amp = h / NUM.TWENTYTWO; // amplitude woven from 22 sacred paths
   const mid = h / 2;
   ctx.strokeStyle = color;
   ctx.lineWidth = 1; // ND-safe: fine lines keep lattice subtle
