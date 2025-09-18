@@ -127,7 +127,7 @@ function drawHelixLattice(ctx, w, h, color, NUM) {
   }
   ctx.stroke();
 
-  // strand B (phase-shifted by π)
+  // strand B (phase-shifted by pi)
   ctx.beginPath();
   for (let i = 0; i <= steps; i++) {
     const x = (i / steps) * w;

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "00-void",
+    "name": "Black Madonna",
+    "type": "archetype",
+    "numerology": 0,
+    "lore": "Primordial Void; Holy Fool.",
+    "art": "img/black-madonna.png",
+    "lab": "labs/void-lab.html",
+    "links": ["01-magician"]
+  },
+  {
+    "id": "01-magician",
+    "name": "The Magician",
+    "type": "tarot",
+    "numerology": 1,
+    "lore": "Master of manifestation and will.",
+    "art": "",
+    "lab": "",
+    "links": ["00-void"]
+  }
+]
