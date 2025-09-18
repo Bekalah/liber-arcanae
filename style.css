@@ -1,0 +1,17 @@
+body { background: #1a1325; color: #f6ecff; font-family: 'EB Garamond', serif; margin: 0; }
+h1 { text-align: center; margin: 2rem 0; }
+#node-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; }
+.node-card {
+  background: #2a1e47cc;
+  border-radius: 1.2rem;
+  box-shadow: 0 1px 16px #382d56bb;
+  padding: 1.4rem;
+  min-width: 220px;
+  max-width: 260px;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+.node-card:hover { transform: scale(1.04); box-shadow: 0 7px 30px #8166c0cc; }
+.node-card img { width: 100%; border-radius: 0.7rem; margin-bottom: 0.5rem; }
+button { margin-top: 0.7rem; background: #5738a9; color: #fff5cf; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; }
+button:hover { background: #7c5ed1; }
