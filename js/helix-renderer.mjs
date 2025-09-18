@@ -50,7 +50,17 @@ function drawVesica(ctx, w, h, color, NUM) {
   }
 }
 
-// Layer 2: Tree-of-Life scaffold with 10 nodes and 22 paths
+/**
+ * Draws the "Tree of Life" scaffold: ten nodes positioned along a vertical axis with up to 22 connecting edges and filled node markers.
+ *
+ * Nodes are spaced using verticalStep = h / NUM.TWENTYTWO. Edges are taken from a fixed raw path list and sliced to NUM.TWENTYTWO entries;
+ * each path is stroked with the provided color. Node circles are filled and sized relative to the canvas using NUM.TWENTYTWO, NUM.NINE, and NUM.THREE.
+ *
+ * @param {number} w - Canvas width in pixels.
+ * @param {number} h - Canvas height in pixels.
+ * @param {string} color - Stroke and fill color for lines and nodes.
+ * @param {Object} NUM - Numeric configuration constants. Required properties: TWENTYTWO, NINE, THREE (used for spacing and node sizing).
+ */
 function drawTreeOfLife(ctx, w, h, color, NUM) {
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
@@ -113,7 +123,20 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
   ctx.stroke();
 }
 
-// Layer 4: Static double-helix lattice
+/**
+ * Draws a static double-helix lattice: two phase-shifted sinusoidal strands with regular vertical crossbars.
+ *
+ * Renders two helical strands across the canvas width and connects them with evenly spaced
+ * vertical bars to form a lattice. Geometry is parameterized so the pattern scales with
+ * the canvas and the provided numeric configuration.
+ *
+ * @param {number} w - Canvas width in pixels.
+ * @param {number} h - Canvas height in pixels.
+ * @param {string} color - Stroke color used for strands and crossbars.
+ * @param {object} NUM - Numeric configuration object. Expected properties used here:
+ *                      ONEFORTYFOUR (step count), TWENTYTWO (amplitude divisor),
+ *                      ELEVEN (phase / sine divisor), and NINE (crossbar spacing divisor).
+ */
 function drawHelixLattice(ctx, w, h, color, NUM) {
   const steps = NUM.ONEFORTYFOUR; // 144 vertical steps
   const amp = h / NUM.TWENTYTWO; // amplitude woven from 22 sacred paths
