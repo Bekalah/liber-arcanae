@@ -1,19 +1,21 @@
 // Per Texturas Numerorum, Spira Loquitur.
-/*
-  helix-renderer.mjs
-  ND-safe static renderer for layered sacred geometry.
-
-  Layers (drawn in order):
-    1) Vesica field
-    2) Tree-of-Life scaffold
-    3) Fibonacci curve
-    4) Double-helix lattice (two phase-shifted strands with calm crossbars)
-
-  Rationale:
-    - No motion or autoplay; everything renders once.
-    - Soft contrast palette keeps focus gentle.
-    - Pure functions highlight numerology constants.
-*/
+/**
+ * Render the full, static helix composition onto a canvas context.
+ *
+ * Orchestrates drawing of four layered geometric patterns (vesica field, Tree of Life scaffold,
+ * Fibonacci curve, and double-helix lattice) in a fixed order onto the provided CanvasRenderingContext2D.
+ * The function clears and fills the background (using palette.bg or a dark default), normalizes up to
+ * four layer colors from the provided palette, preserves and restores canvas state, and sets rounded
+ * line joins/caps for smoother strokes. Rendering is immediate and has no animation or side effects
+ * beyond drawing to the given context.
+ *
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D rendering context to draw onto.
+ * @param {Object} opts - Rendering options.
+ * @param {number} opts.width - Canvas width in pixels.
+ * @param {number} opts.height - Canvas height in pixels.
+ * @param {Object} [opts.palette] - Optional color palette; may include `layers` (array), `ink` (filler), and `bg` (background).
+ * @param {Object} opts.NUM - Numeric configuration/constants used by the layer renderers (e.g., THREE, NINE, TWENTYTWO, etc.).
+ */
 
 export function renderHelix(ctx, opts) {
   const { width, height, palette, NUM } = opts;
@@ -36,6 +38,17 @@ export function renderHelix(ctx, opts) {
   ctx.restore();
 }
 
+/**
+ * Produce a 4-element array of layer colors from a palette, padding with a filler color if needed.
+ *
+ * If `palette.layers` is an array its values are copied; otherwise starts empty. Missing entries
+ * are filled with `palette.ink` or the default `#e8e8f0`. Always returns a new array of exactly
+ * four color strings.
+ *
+ * @param {Object} [palette] - Palette object that may contain `layers` (array of color strings)
+ *   and `ink` (fallback color string).
+ * @return {string[]} Array of four color strings to be used for rendering layers.
+ */
 function normalizeLayers(palette) {
   const tones = palette && Array.isArray(palette.layers) ? [...palette.layers] : [];
   const filler = (palette && palette.ink) || "#e8e8f0";
@@ -122,7 +135,23 @@ function drawTreeOfLife(ctx, w, h, color, NUM) {
   }
 }
 
-// Layer 3: Fibonacci curve using 33 segments
+/**
+ * Draws a Fibonacci-inspired spiral curve as a connected polyline.
+ *
+ * Uses the golden ratio (φ) to grow radial distance exponentially and samples
+ * angles in fixed steps to produce a spiral-like polyline centered near the
+ * upper-right quadrant of the canvas. The path is stroked with the provided color.
+ *
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D rendering context to draw on.
+ * @param {number} w - Canvas width in pixels.
+ * @param {number} h - Canvas height in pixels.
+ * @param {string} color - Stroke color used for the curve.
+ * @param {Object} NUM - Numeric configuration object. Expected properties:
+ *   - NINETYNINE: divisor used to compute the base scale,
+ *   - THIRTYTHREE: number of segments (the loop runs 0..THIRTYTHREE),
+ *   - SEVEN: divisor used for angular step (theta = i * (PI / SEVEN)),
+ *   - NINE: divisor used in the exponential radius (phi^(i / NINE)).
+ */
 function drawFibonacciCurve(ctx, w, h, color, NUM) {
   const phi = (1 + Math.sqrt(5)) / 2;
   const center = { x: w * 0.75, y: h * 0.3 };
@@ -145,19 +174,17 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
 }
 
 /**
- * Draws a static double-helix lattice: two phase-shifted sinusoidal strands with regular vertical crossbars.
+ * Draws a static double-helix lattice: two phase-shifted sinusoidal strands connected by vertical crossbars.
  *
- * Renders two helical strands across the canvas width and connects them with evenly spaced
- * vertical bars to form a lattice. Geometry is parameterized so the pattern scales with
- * the canvas and the provided numeric configuration.
+ * Renders two sine-wave strands across the canvas width (one phase-shifted by π) and draws vertical
+ * bars at regular intervals between them to form a lattice. Coordinates and spacing scale with the
+ * provided canvas dimensions and numeric configuration.
  *
- * @param {CanvasRenderingContext2D} ctx - Target 2D drawing context.
+ * @param {CanvasRenderingContext2D} ctx - Target 2D drawing context to render into.
  * @param {number} w - Canvas width in pixels.
  * @param {number} h - Canvas height in pixels.
- * @param {string} color - Stroke color used for strands and crossbars.
- * @param {object} NUM - Numeric configuration object. Expected properties used here:
- *                      ONEFORTYFOUR (step count), TWENTYTWO (amplitude divisor),
- *                      ELEVEN (phase / sine divisor), and NINE (crossbar spacing divisor).
+ * @param {string} color - Stroke color for strands and crossbars.
+ * @param {object} NUM - Numeric configuration object. Expected properties: ONEFORTYFOUR, TWENTYTWO, ELEVEN, NINE.
  */
 function drawHelixLattice(ctx, w, h, color, NUM) {
   const steps = NUM.ONEFORTYFOUR; // 144 vertical steps
