@@ -28,11 +28,11 @@ Geometry routines in this renderer reference sacred numbers 3, 7, 9, 11, 22, 33,
 ## Local Use
 Double-click [index.html](./index.html) in any modern browser. The 1440×900 canvas renders immediately with no network calls.
 The renderer depends on [`js/helix-renderer.mjs`](./js/helix-renderer.mjs) and optional [`data/palette.json`](./data/palette.json).
-Everything runs offline.
+Everything runs offline. The Pantheon atlas at the top of the page remains intact; the helix canvas sits beneath the node catalogue and shares the Calm Mode toggle for consistent softening.
 
 ## ND-safe Notes
 - No motion or flashing; all elements render statically in layer order.
-- Palette uses gentle contrast for readability, with Calm Mode softening hues when toggled or when the OS requests reduced motion.
+- Palette uses gentle contrast for readability, with Calm Mode softening hues when toggled or when the OS requests reduced motion. Status text clarifies when fallbacks are engaged.
 - Skip link, `<main>` landmark, and status messaging keep the page navigable by keyboard and assistive tech.
 - Pure functions, ES modules, UTF-8, and LF newlines.
 - Palette file can be edited offline to adjust hues; the page falls back to built-in colors if it's missing and surfaces a small inline notice.

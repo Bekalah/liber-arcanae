@@ -144,6 +144,45 @@ main {
   box-shadow: 0 10px 40px rgba(10, 6, 20, 0.45);
 }
 
+.cosmic-helix {
+  margin-top: 3rem;
+  background: rgba(14, 9, 24, 0.72);
+  border: 1px solid var(--card-border);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(10, 6, 20, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.cosmic-head {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+#helix-stage {
+  width: min(100%, 960px);
+  height: auto;
+  aspect-ratio: 1440 / 900;
+  display: block;
+  border-radius: 1rem;
+  box-shadow: 0 0 0 1px rgba(159, 143, 225, 0.3), 0 25px 45px rgba(9, 6, 18, 0.5);
+  background: radial-gradient(circle at top, rgba(38, 26, 62, 0.65), rgba(14, 9, 24, 0.9));
+}
+
+.cosmic-note {
+  margin: 0;
+  max-width: 60ch;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
 .catalogue-head {
   display: flex;
   flex-wrap: wrap;
@@ -269,6 +308,15 @@ main {
 
 .calm-mode .catalogue {
   background: rgba(14, 9, 21, 0.8);
+}
+
+.calm-mode .cosmic-helix {
+  background: rgba(11, 7, 18, 0.85);
+}
+
+.calm-mode #helix-stage {
+  box-shadow: 0 0 0 1px rgba(122, 106, 189, 0.35);
+  background: radial-gradient(circle at top, rgba(35, 24, 58, 0.6), rgba(11, 7, 18, 0.9));
 }
 
 @media (max-width: 720px) {
