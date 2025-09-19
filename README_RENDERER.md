@@ -2,38 +2,38 @@ Per Texturas Numerorum, Spira Loquitur.
 
 # Cosmic Helix Renderer
 
-Static, ND-safe HTML5 canvas renderer for layered sacred geometry. Open [index.html](./index.html) directly in a browser; no build steps or network requests.
+Static, ND-safe HTML5 canvas renderer for layered sacred geometry. Open [`index.html`](./index.html) directly in any modern browser; no build steps, servers, or network calls are required.
 
-## Layers
-1. **Vesica field** – intersecting circles laid out with the constant 3.
-2. **Tree-of-Life** – ten sephirot with twenty-two connecting paths.
-3. **Fibonacci curve** – fixed logarithmic spiral honoring natural growth.
-4. **Double-helix lattice** – two phase-shifted strands with calm crossbars.
+## Files
+- [`index.html`](./index.html) — offline entry point with a 1440×900 canvas, status notice, and palette fallback logic.
+- [`js/helix-renderer.mjs`](./js/helix-renderer.mjs) — pure ES module that draws the four sacred layers.
+- [`data/palette.json`](./data/palette.json) — optional palette override; delete or edit to suit your local ritual.
 
-Each layer uses the next color from [`data/palette.json`](./data/palette.json). If the palette file is missing, a safe fallback loads and a small notice appears.
+If `data/palette.json` cannot be read (common when double-clicking without a server), the page shows a small inline notice and uses a built-in ND-safe palette.
 
-## Numerology as Spiral Grammar
-The constants of the Cathedral are Fibonacci-coded checkpoints rather than flat decoration:
+## Layer Order
+1. **Vesica field** — 3×3 grid of intersecting circles honoring the triad.
+2. **Tree-of-Life scaffold** — ten sephirot with twenty-two connecting paths.
+3. **Fibonacci curve** — logarithmic spiral polyline stepped thirty-three times.
+4. **Double-helix lattice** — two phase-shifted strands with calm crossbars.
 
-- **21 pillars** – a Fibonacci node (8 + 13) aligning to Tarot majors and 21 Taras.
-- **33 spine** – triple elevens forming the Christic ladder.
-- **72 Shem angels/demons** – lunar decan cycle (8 × 9).
-- **78 archetypes** – complete Tarot weave (22 + 56).
-- **99 gates** – threefold expansion of the spine (3 × 33).
-- **144 lattice** – perfect square of 12 and 8th Fibonacci.
-- **243 completion** – fivefold power of the triad (3⁵).
+Each layer pulls the next color from the sanitized palette. Geometry functions are small and use `ctx.save()` / `ctx.restore()` so one layer never disturbs another.
 
-Geometry routines in this renderer reference sacred numbers 3, 7, 9, 11, 22, 33, 99, and 144 to keep proportions meaningful while staying static.
+## Numerology Anchors
+The renderer parameterizes every proportion with constants 3, 7, 9, 11, 22, 33, 99, and 144:
+- 3 × 3 Vesica grid.
+- 7-based angular sweep for the Fibonacci segments.
+- 9-based scaling and crossbar cadence.
+- 11-based sine frequency for the helix.
+- 22 vertical steps, node spacing, and amplitude.
+- 33 Fibonacci polyline steps.
+- 99 divisor softening the spiral radius.
+- 144 helix samples across the canvas width.
 
-## Local Use
-Double-click [index.html](./index.html) in any modern browser. The 1440×900 canvas renders immediately with no network calls.
-The renderer depends on [`js/helix-renderer.mjs`](./js/helix-renderer.mjs) and optional [`data/palette.json`](./data/palette.json).
-Everything runs offline.
+## Offline Use
+Double-click [`index.html`](./index.html) and the canvas renders immediately. No workflow, build tool, or internet connection is needed. The module exports a single `renderHelix` function should you wish to reuse it in other offline rituals.
 
 ## ND-safe Notes
-- No motion or flashing; all elements render statically in layer order.
-- Palette uses gentle contrast for readability, with Calm Mode softening hues when toggled or when the OS requests reduced motion.
-- Skip link, `<main>` landmark, and status messaging keep the page navigable by keyboard and assistive tech.
-- Pure functions, ES modules, UTF-8, and LF newlines.
-- Palette file can be edited offline to adjust hues; the page falls back to built-in colors if it's missing and surfaces a small inline notice.
-
+- No animation, flashing, or audio — everything draws once in calm order.
+- Palette defaults use gentle contrast; document colors sync to the active palette so text stays readable.
+- Comments explain the safety choices and numerology rationale for future stewards.

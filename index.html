@@ -1,217 +1,57 @@
 <!doctype html>
 <html lang="en">
 <head>
-
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Liber Arcanae Pantheon Atlas</title>
-  <meta name="description" content="Offline-first pantheon atlas for Codex 144:99 with ND-safe calm mode controls.">
-  <link rel="canonical" href="https://liber-arcanae.local/app/">
-  <meta name="theme-color" content="#6c5ba7">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="192x192" href="img/icons/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="img/icons/icon-512.png">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header" role="banner">
-    <div class="site-identity">
-      <h1>Liber Arcanae Pantheon Atlas</h1>
-      <p>Layered geometry and tarot research channels held within Codex 144:99 for offline study.</p>
-    </div>
-    <button id="calm-toggle" class="calm-toggle" type="button" aria-pressed="false" aria-describedby="calm-note">
-      <span class="calm-toggle__label">Calm mode off</span>
-    </button>
-  </header>
-  <p id="calm-note" class="visually-hidden">Calm mode softens color contrast and disables motion for ND-safe review.</p>
-  <main id="main" tabindex="-1">
-    <section class="hero" aria-labelledby="hero-heading">
-      <div class="hero-media">
-        <img src="img/black-madonna.webp" alt="Aurora gate gradient evoking Leonora Carrington constellations." loading="lazy" decoding="async" width="720" height="450">
-      </div>
-      <div class="hero-copy">
-        <h2 id="hero-heading">Aurora Gate Research Anchor</h2>
-        <p>This calm field is a grounded stand-in when Git LFS art is unavailable offline. It keeps the palette below 200 KB and honors the covenant&apos;s layered geometry request.</p>
-      </div>
-    </section>
-    <section class="catalogue" aria-labelledby="pantheon-heading">
-      <div class="catalogue-head">
-        <h2 id="pantheon-heading">Pantheon Node Catalogue</h2>
-        <p class="status-line" data-status role="status" aria-live="polite">Preparing node stream…</p>
-      </div>
-      <div id="node-list" class="node-list" role="list"></div>
-    </section>
-  </main>
-  <footer class="site-footer">
-    <p>Service worker keeps the atlas offline-first; manifest icons cover 192 and 512 requirements.</p>
-  </footer>
-  <script type="module">
-    import { initNodeGallery } from './js/loadNodes.js';
-
-    const statusEl = document.querySelector('[data-status]');
-    const listEl = document.getElementById('node-list');
-    const calmToggle = document.getElementById('calm-toggle');
-    const calmLabel = calmToggle.querySelector('.calm-toggle__label');
-    const storageKey = 'liber-arcanae.calm-mode';
-
-    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-    const getStoredPreference = () => {
-      try {
-        return window.localStorage.getItem(storageKey);
-      } catch (error) {
-        console.warn('localStorage unavailable, calm mode defaults only.', error);
-        return null;
-      }
-    };
-
-    const setStoredPreference = (value) => {
-      try {
-        window.localStorage.setItem(storageKey, value);
-      } catch (error) {
-        console.warn('Unable to persist calm mode preference.', error);
-      }
-    };
-
-    const syncCalmState = (active) => {
-      calmToggle.setAttribute('aria-pressed', active ? 'true' : 'false');
-      calmLabel.textContent = active ? 'Calm mode on' : 'Calm mode off';
-    };
-
-    const storedPreference = getStoredPreference();
-    const startCalm = storedPreference === 'on' || (storedPreference === null && mql.matches);
-    if (startCalm) {
-      document.body.classList.add('calm-mode');
-    }
-    syncCalmState(document.body.classList.contains('calm-mode'));
-
-    calmToggle.addEventListener('click', () => {
-      const active = document.body.classList.toggle('calm-mode');
-      syncCalmState(active);
-      setStoredPreference(active ? 'on' : 'off');
-    });
-
-    const handleMotionChange = (event) => {
-      if (getStoredPreference() !== null) {
-        return;
-      }
-      if (event.matches) {
-        document.body.classList.add('calm-mode');
-      } else {
-        document.body.classList.remove('calm-mode');
-      }
-      syncCalmState(document.body.classList.contains('calm-mode'));
-    };
-
-    if (typeof mql.addEventListener === 'function') {
-      mql.addEventListener('change', handleMotionChange);
-    } else if (typeof mql.addListener === 'function') {
-      mql.addListener(handleMotionChange);
-    }
-
-    initNodeGallery({ listEl, statusEl });
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch((error) => {
-          console.warn('Service worker registration failed:', error);
-        });
-      });
-
   <meta charset="utf-8">
   <title>Cosmic Helix Renderer (ND-safe, Offline)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <style>
-    /* ND-safe: calm contrast, no motion, generous spacing */
-    :root { --bg:#0b0b12; --ink:#e8e8f0; --muted:#a6a6c1; --outline:#1d1d2a; }
-    body { margin:0; padding:0; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
-    body.calm-mode { --bg:#080812; --ink:#f3f3fa; --muted:#c0c0dd; --outline:#27273c; }
-    a { color:inherit; }
-    .skip-link { position:absolute; left:-999px; top:auto; width:1px; height:1px; overflow:hidden; }
-    .skip-link:focus { left:16px; top:12px; width:auto; height:auto; padding:8px 12px; background:#1d1d2a; color:#f0f0ff; border-radius:6px; z-index:1000; text-decoration:none; }
-    header { padding:12px 16px; border-bottom:1px solid var(--outline); display:flex; flex-direction:column; gap:8px; }
-    .header-title { margin:0; font-size:16px; font-weight:600; }
-    .controls { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+    /* ND-safe: calm contrast, no motion, layered spacing */
+    :root { --bg:#0b0b12; --ink:#e8e8f0; --muted:#a6a6c1; }
+    html,body { margin:0; padding:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+    header { padding:12px 16px; border-bottom:1px solid #1d1d2a; }
+    main { padding:0 16px 24px; }
     .status { color:var(--muted); font-size:12px; }
-    .calm-button { border:1px solid var(--outline); background:transparent; color:var(--ink); padding:6px 12px; border-radius:6px; font:inherit; cursor:pointer; }
-    .calm-button:hover,.calm-button:focus-visible { border-color:var(--muted); outline:none; }
-    .calm-button[aria-pressed="true"] { background:rgba(45,45,70,0.35); }
-    .calm-button:disabled { opacity:0.6; cursor:not-allowed; }
-    main { padding:16px; display:flex; flex-direction:column; align-items:center; gap:16px; }
-    #stage { display:block; margin:0 auto; box-shadow:0 0 0 1px var(--outline); background:var(--bg); }
-    .note { max-width:900px; margin:0 auto 16px; color:var(--muted); }
-    code { background:#11111a; padding:2px 4px; border-radius:3px; }
+    #stage { display:block; margin:24px auto 16px; box-shadow:0 0 0 1px #1d1d2a; background:var(--bg); }
+    .note { max-width:900px; margin:0 auto; color:var(--muted); }
+    strong { letter-spacing:0.01em; }
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
   <header>
-    <h1 class="header-title">Cosmic Helix Renderer — layered sacred geometry (offline, ND-safe)</h1>
-    <div class="controls">
-      <button type="button" id="calm-toggle" class="calm-button" aria-pressed="false">Calm Mode</button>
-      <span class="status" id="status" role="status" aria-live="polite">Loading palette…</span>
-    </div>
+    <div><strong>Cosmic Helix Renderer</strong> — layered sacred geometry (offline, ND-safe)</div>
+    <div class="status" id="status" role="status" aria-live="polite">Loading palette…</div>
   </header>
-
-  <main id="main">
+  <main>
     <canvas id="stage" width="1440" height="900" aria-label="Layered sacred geometry canvas" role="img"></canvas>
     <p class="note">This static renderer encodes Vesica, Tree-of-Life, Fibonacci, and a static double-helix lattice. No animation, no autoplay, no external libraries. Open this file directly.</p>
   </main>
-
   <script type="module">
     import { renderHelix } from "./js/helix-renderer.mjs";
 
-    const elStatus = document.getElementById("status");
+    const statusEl = document.getElementById("status");
     const canvas = document.getElementById("stage");
-    const calmToggle = document.getElementById("calm-toggle");
     const ctx = canvas.getContext("2d");
-    const body = document.body;
 
-    const defaults = {
-      palette: {
-        bg:"#0b0b12",
-        ink:"#e8e8f0",
-        layers:["#b1c7ff","#89f7fe","#a0ffa1","#ffd27f","#f5a3ff","#d0d0e6"]
-      }
+    // Numerology constants anchor each layer's proportions.
+    const NUM = { THREE:3, SEVEN:7, NINE:9, ELEVEN:11, TWENTYTWO:22, THIRTYTHREE:33, NINETYNINE:99, ONEFORTYFOUR:144 };
+
+    // ND-safe defaults keep contrast gentle when palette data is missing.
+    const DEFAULT_PALETTE = {
+      bg:"#0b0b12",
+      ink:"#e8e8f0",
+      layers:["#b1c7ff","#89f7fe","#a0ffa1","#ffd27f","#f5a3ff","#d0d0e6"]
     };
 
-    const NUM = {
-      THREE:3,
-      SEVEN:7,
-      NINE:9,
-      ELEVEN:11,
-      TWENTYTWO:22,
-      THIRTYTHREE:33,
-      NINETYNINE:99,
-      ONEFORTYFOUR:144
-    };
+    const paletteData = await loadJSON("./data/palette.json");
+    const palette = sanitizePalette(paletteData, DEFAULT_PALETTE);
+    statusEl.textContent = paletteData ? "Palette loaded." : "Palette missing; using safe fallback.";
+    applyPaletteToDocument(palette);
 
     if (!ctx) {
-      elStatus.textContent = "Canvas context unavailable; static illustration cannot render.";
-      calmToggle.disabled = true;
-      calmToggle.setAttribute("aria-disabled", "true");
+      statusEl.textContent += " Canvas context unavailable; static illustration cannot render.";
     } else {
-      setupRenderer();
-    }
-
-    async function setupRenderer() {
-      const paletteData = await loadJSON("./data/palette.json");
-      const palette = sanitizePalette(paletteData, defaults.palette);
-      const paletteMessage = paletteData ? "Palette loaded." : "Palette missing; using safe fallback.";
-      const palettes = { active: palette, calm: createCalmPalette(palette) };
-      const calmState = createCalmState({
-        body,
-        button: calmToggle,
-        statusEl: elStatus,
-        ctx,
-        canvas,
-        palettes,
-        baseMessage: paletteMessage,
-        NUM
-      });
-      calmState.init();
+      renderHelix(ctx, { width:canvas.width, height:canvas.height, palette, NUM });
     }
 
     async function loadJSON(path) {
@@ -220,117 +60,39 @@
         if (!res.ok) throw new Error(String(res.status));
         return await res.json();
       } catch (err) {
-        return null; // Offline-first: fall back quietly
+        return null; // Offline-first: fall back quietly.
       }
     }
 
-    function sanitizePalette(input, fallback) {
-      if (!input || typeof input !== "object") return clonePalette(fallback);
-      const safe = {
-        bg:isHex(input.bg) ? input.bg : fallback.bg,
-        ink:isHex(input.ink) ? input.ink : fallback.ink,
-        layers:Array.isArray(input.layers) ? input.layers.filter(isHex) : []
+    function sanitizePalette(data, fallback) {
+      if (!data || typeof data !== "object") return clonePalette(fallback);
+      const sanitized = {
+        bg:isHex(data.bg) ? data.bg : fallback.bg,
+        ink:isHex(data.ink) ? data.ink : fallback.ink,
+        layers:Array.isArray(data.layers) ? data.layers.filter(isHex) : []
       };
-      const needed = fallback.layers.length;
-      while (safe.layers.length < needed) {
-        safe.layers.push(fallback.layers[safe.layers.length % fallback.layers.length]);
+      const needed = 4; // four layers in the renderer
+      while (sanitized.layers.length < needed) {
+        sanitized.layers.push(fallback.layers[sanitized.layers.length % fallback.layers.length]);
       }
-      safe.layers = safe.layers.slice(0, needed);
-      return safe;
+      sanitized.layers = sanitized.layers.slice(0, needed);
+      return sanitized;
     }
 
     function clonePalette(palette) {
       return { bg:palette.bg, ink:palette.ink, layers:palette.layers.slice() };
     }
 
-    function createCalmPalette(base) {
-      // ND-safe: soften hues without removing contrast
-      return {
-        bg:mixHex(base.bg, base.ink, 0.08),
-        ink:base.ink,
-        layers:base.layers.map(layer => mixHex(layer, base.ink, 0.25))
-      };
-    }
-
-    function createCalmState({ body, button, statusEl, ctx, canvas, palettes, baseMessage, NUM }) {
-      let calmActive = false;
-      let manualOverride = false;
-      const media = typeof window.matchMedia === "function"
-        ? window.matchMedia("(prefers-reduced-motion: reduce)")
-        : { matches:false };
-
-      const apply = (state, source) => {
-        calmActive = state;
-        body.classList.toggle("calm-mode", state);
-        button.setAttribute("aria-pressed", state ? "true" : "false");
-        const calmNote = state ? " Calm Mode active for softer palette." : " Calm Mode ready (toggle for softer palette).";
-        let origin = "";
-        if (source === "manual") origin = " Manual override engaged.";
-        if (source === "sync") origin = " Manual override cleared; synced with system preference.";
-        if (source === "preference" && state) origin = " Honoring system calm preference.";
-        statusEl.textContent = baseMessage + calmNote + origin;
-        renderHelix(ctx, {
-          width:canvas.width,
-          height:canvas.height,
-          palette: state ? palettes.calm : palettes.active,
-          NUM
-        });
-      };
-
-      const handlePreference = event => {
-        if (manualOverride) return; // Respect user toggle
-        apply(event.matches, "preference");
-      };
-
-      const init = () => {
-        apply(media.matches, "preference");
-        button.addEventListener("click", () => {
-          const nextState = !calmActive;
-          manualOverride = nextState !== media.matches;
-          const source = manualOverride ? "manual" : "sync";
-          apply(nextState, source);
-        });
-        if (typeof media.addEventListener === "function") {
-          media.addEventListener("change", handlePreference);
-        } else if (typeof media.addListener === "function") {
-          media.addListener(handlePreference);
-        }
-      };
-
-      return { init };
-    }
-
     function isHex(value) {
       return typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value);
     }
 
-    function mixHex(hexA, hexB, weight) {
-      const a = hexToRgb(hexA);
-      const b = hexToRgb(hexB);
-      const w = clamp(weight, 0, 1);
-      const blended = {
-        r:Math.round(a.r * (1 - w) + b.r * w),
-        g:Math.round(a.g * (1 - w) + b.g * w),
-        b:Math.round(a.b * (1 - w) + b.b * w)
-      };
-      return rgbToHex(blended);
-    }
-
-    function hexToRgb(hex) {
-      const clean = hex.replace("#", "");
-      const r = parseInt(clean.slice(0, 2), 16);
-      const g = parseInt(clean.slice(2, 4), 16);
-      const b = parseInt(clean.slice(4, 6), 16);
-      return { r:Number.isNaN(r) ? 0 : r, g:Number.isNaN(g) ? 0 : g, b:Number.isNaN(b) ? 0 : b };
-    }
-
-    function rgbToHex({ r, g, b }) {
-      return "#" + [r, g, b].map(v => clamp(v, 0, 255).toString(16).padStart(2, "0")).join("");
-    }
-
-    function clamp(value, min, max) {
-      return Math.min(Math.max(value, min), max);
-
+    function applyPaletteToDocument(palette) {
+      const root = document.documentElement.style;
+      root.setProperty("--bg", palette.bg);
+      root.setProperty("--ink", palette.ink);
+      document.body.style.background = palette.bg;
+      document.body.style.color = palette.ink;
     }
   </script>
 </body>
