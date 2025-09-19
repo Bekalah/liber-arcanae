@@ -17,16 +17,32 @@
 
 export function renderHelix(ctx, opts) {
   const { width, height, palette, NUM } = opts;
+  const layerColors = normalizeLayers(palette);
+  const background = (palette && palette.bg) || "#0b0b12";
+
+  ctx.save();
   ctx.clearRect(0, 0, width, height);
   // ND-safe: fill background first to avoid flashes
-  ctx.fillStyle = palette.bg;
+  ctx.fillStyle = background;
   ctx.fillRect(0, 0, width, height);
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
 
   // Layer order preserves depth: base geometry first, lattice last
-  drawVesica(ctx, width, height, palette.layers[0], NUM);
-  drawTreeOfLife(ctx, width, height, palette.layers[1], NUM);
-  drawFibonacciCurve(ctx, width, height, palette.layers[2], NUM);
-  drawHelixLattice(ctx, width, height, palette.layers[3], NUM);
+  drawVesica(ctx, width, height, layerColors[0], NUM);
+  drawTreeOfLife(ctx, width, height, layerColors[1], NUM);
+  drawFibonacciCurve(ctx, width, height, layerColors[2], NUM);
+  drawHelixLattice(ctx, width, height, layerColors[3], NUM);
+  ctx.restore();
+}
+
+function normalizeLayers(palette) {
+  const tones = palette && Array.isArray(palette.layers) ? [...palette.layers] : [];
+  const filler = (palette && palette.ink) || "#e8e8f0";
+  while (tones.length < 4) {
+    tones.push(filler);
+  }
+  return tones;
 }
 
 // Layer 1: Vesica field using a 3x3 grid
@@ -56,6 +72,7 @@ function drawVesica(ctx, w, h, color, NUM) {
  * Nodes are spaced using verticalStep = h / NUM.TWENTYTWO. Edges are taken from a fixed raw path list and sliced to NUM.TWENTYTWO entries;
  * each path is stroked with the provided color. Node circles are filled and sized relative to the canvas using NUM.TWENTYTWO, NUM.NINE, and NUM.THREE.
  *
+ * @param {CanvasRenderingContext2D} ctx - Target 2D drawing context.
  * @param {number} w - Canvas width in pixels.
  * @param {number} h - Canvas height in pixels.
  * @param {string} color - Stroke and fill color for lines and nodes.
@@ -118,7 +135,11 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
     const r = scale * Math.pow(phi, i / NUM.NINE);
     const x = center.x + r * Math.cos(theta);
     const y = center.y + r * Math.sin(theta);
-    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
   }
   ctx.stroke();
 }
@@ -130,6 +151,7 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
  * vertical bars to form a lattice. Geometry is parameterized so the pattern scales with
  * the canvas and the provided numeric configuration.
  *
+ * @param {CanvasRenderingContext2D} ctx - Target 2D drawing context.
  * @param {number} w - Canvas width in pixels.
  * @param {number} h - Canvas height in pixels.
  * @param {string} color - Stroke color used for strands and crossbars.
@@ -149,7 +171,11 @@ function drawHelixLattice(ctx, w, h, color, NUM) {
   for (let i = 0; i <= steps; i++) {
     const x = (i / steps) * w;
     const y = mid + amp * Math.sin(i / NUM.ELEVEN);
-    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
   }
   ctx.stroke();
 
@@ -158,12 +184,16 @@ function drawHelixLattice(ctx, w, h, color, NUM) {
   for (let i = 0; i <= steps; i++) {
     const x = (i / steps) * w;
     const y = mid + amp * Math.sin(i / NUM.ELEVEN + Math.PI);
-    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
   }
   ctx.stroke();
 
   // crossbars every 16 steps (approx 144/9)
-  const barStep = Math.floor(steps / NUM.NINE); // ND-safe: static crossbars provide calm symmetry
+  const barStep = Math.max(1, Math.floor(steps / NUM.NINE)); // ND-safe: static crossbars provide calm symmetry
   for (let i = 0; i <= steps; i += barStep) {
     const x = (i / steps) * w;
     const y1 = mid + amp * Math.sin(i / NUM.ELEVEN);
