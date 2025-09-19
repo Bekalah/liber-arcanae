@@ -6,7 +6,7 @@ const PRECACHE_URLS = [
   './manifest.webmanifest',
   './js/loadNodes.js',
   './data/nodes.json',
-  './img/black-madonna.webp',
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO8N0a8AAAAASUVORK5CYII=',
   './img/icons/icon-192.png',
   './img/icons/icon-512.png',
   './labs/void-lab.html'
