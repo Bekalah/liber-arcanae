@@ -124,14 +124,14 @@ function drawTreeOfLife(ctx, w, h, color, NUM) {
 }
 
 /**
- * Draws a static Fibonacci (golden-ratio) spiral onto the provided canvas context.
+ * Render a stroked Fibonacci (golden-ratio) spiral onto the canvas.
  *
- * Renders a stroked spiral centered at ~(75% width, 30% height) using 33 segments. The drawing
- * uses the golden ratio to exponentially increase radius with each segment.
+ * The spiral is centered near (75% width, 30% height) and sampled using NUM.THIRTYTHREE+1 points;
+ * radius grows exponentially by the golden ratio. Stroke width is 2.
  *
- * @param {string} [color] - Stroke color for the curve. Defaults to "#e8e8f0" when falsy.
- * @param {object} NUM - Numeric constants object. Required keys: THIRTYTHREE, SEVEN, NINE, NINETYNINE.
- */
+ * @param {string} [color] - Stroke color for the curve. If falsy, defaults to "#e8e8f0".
+ * @param {object} NUM - Numeric constants used to control sampling and scaling. Required keys:
+ *                       THIRTYTHREE, SEVEN, NINE, NINETYNINE.
 function drawFibonacciCurve(ctx, w, h, color, NUM) {
   const curveColor = color || "#e8e8f0"; // ensures spiral stays visible even with short palettes
   const phi = (1 + Math.sqrt(5)) / 2;
@@ -151,16 +151,16 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
 }
 
 /**
- * Render a static double-helix lattice: two phase-shifted sinusoidal strands with vertical crossbars.
+ * Render a static double-helix lattice: two phase-shifted sinusoidal strands with evenly spaced vertical crossbars.
  *
- * Draws two helical strands across the canvas width and connects them with evenly spaced vertical bars.
- * Scales to the provided canvas size and uses numeric constants from `NUM` to control resolution,
- * amplitude, phase, and crossbar spacing. Mutates the supplied CanvasRenderingContext2D (stroke-only).
+ * Draws two helical strands across the canvas width and connects them with vertical bars. Scales to the provided
+ * canvas size, uses a fallback stroke color "#e8e8f0" when color is falsy, and mutates the supplied CanvasRenderingContext2D
+ * by stroking paths (no fill, no return value).
  *
  * @param {number} w - Canvas width in pixels.
  * @param {number} h - Canvas height in pixels.
  * @param {string} color - Stroke color for strands and crossbars; falls back to "#e8e8f0" if falsy.
- * @param {object} NUM - Numeric config with required properties:
+ * @param {object} NUM - Numeric config object with required properties:
  *                       ONEFORTYFOUR (total vertical steps),
  *                       TWENTYTWO (amplitude divisor),
  *                       ELEVEN (sine divisor for phase),
