@@ -11,6 +11,7 @@ Static, ND-safe HTML5 canvas renderer for layered sacred geometry. Open [index.h
 4. **Double-helix lattice** – two phase-shifted strands with calm crossbars.
 
 Each layer uses the next color from [`data/palette.json`](./data/palette.json). If the palette file is missing, a calm inline status notice appears and the renderer falls back to built-in hues.
+Each layer draws with the next tone from [`data/palette.json`](./data/palette.json). If that file is absent, the page reports a gentle inline notice and renders with a built-in fallback palette so the geometry remains visible.
 
 ## Numerology as Spiral Grammar
 The constants of the Cathedral are Fibonacci-coded checkpoints rather than flat decoration:
@@ -34,6 +35,12 @@ Everything runs offline.
 - No motion or flashing; all elements render statically in layer order.
 - Palette uses gentle contrast for readability, with Calm Mode softening hues when toggled or when the OS requests reduced motion.
 - Palette uses gentle contrast for readability and honors reduced-motion preferences by avoiding animation entirely.
+The renderer depends on [`js/helix-renderer.mjs`](./js/helix-renderer.mjs) and optional [`data/palette.json`](./data/palette.json).
+Everything runs offline. The Pantheon atlas at the top of the page remains intact; the helix canvas sits beneath the node catalogue and shares the Calm Mode toggle for consistent softening.
+
+## ND-safe Notes
+- No motion or flashing; all elements render statically in layer order.
+- Palette uses gentle contrast for readability, with Calm Mode softening hues when toggled or when the OS requests reduced motion. Status text clarifies when fallbacks are engaged.
 - Skip link, `<main>` landmark, and status messaging keep the page navigable by keyboard and assistive tech.
 - Pure functions, ES modules, UTF-8, and LF newlines.
 - Palette file can be edited offline to adjust hues; the page falls back to built-in colors if it's missing and surfaces a small inline notice.
