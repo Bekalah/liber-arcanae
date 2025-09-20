@@ -36,15 +36,15 @@ export function renderHelix(ctx, opts) {
 }
 
 /**
- * Draws a 3x3 vesica field: paired overlapping circles in each grid cell.
+ * Render a 3×3 vesica field: two horizontally offset stroked circles centered in each grid cell.
  *
- * Draws two small, horizontally offset stroked circles at the center of each
- * cell in a 3×3 grid across the given width/height. Uses a gentle radius
- * derived from the minimum dimension and NUM.NINE to keep spacing visually
- * balanced. If `color` is falsy, the function falls back to "#e8e8f0".
+ * The function draws paired circles at the center of each cell in a 3×3 grid across the provided
+ * width/height on the given canvas context. Circle radius is computed from the minimum canvas
+ * dimension and NUM.NINE to maintain balanced spacing. If `color` is falsy a neutral fallback
+ * ("#e8e8f0") is used to preserve legibility.
  *
- * @param {string} color - Stroke color for the circles; fallback "#e8e8f0" used when falsy.
- * @param {object} NUM - Numeric constants provider; function reads NUM.THREE and NUM.NINE.
+ * @param {string} color - Stroke color for the circles; fallback "#e8e8f0" is applied when falsy.
+ * @param {object} NUM - Numeric constants provider; the function reads NUM.THREE and NUM.NINE.
  */
 function drawVesica(ctx, w, h, color, NUM) {
   const strokeColor = color || "#e8e8f0"; // fallback keeps geometry legible if palette trims
@@ -124,13 +124,12 @@ function drawTreeOfLife(ctx, w, h, color, NUM) {
 }
 
 /**
- * Draws a static Fibonacci (golden-ratio) spiral onto the provided canvas context.
+ * Render a Fibonacci (golden-ratio) spiral as a stroked path on the canvas.
  *
- * Renders a stroked spiral centered at ~(75% width, 30% height) using 33 segments. The drawing
- * uses the golden ratio to exponentially increase radius with each segment.
+ * Draws a continuous spiral centered near (75% width, 30% height). Radius grows exponentially using the golden ratio; the curve is sampled in NUM.THIRTYTHREE steps and stroked.
  *
- * @param {string} [color] - Stroke color for the curve. Defaults to "#e8e8f0" when falsy.
- * @param {object} NUM - Numeric constants object. Required keys: THIRTYTHREE, SEVEN, NINE, NINETYNINE.
+ * @param {string} [color] - Stroke color; falsy values fall back to "#e8e8f0".
+ * @param {object} NUM - Numeric constants required by the algorithm. Must include THIRTYTHREE, SEVEN, NINE, and NINETYNINE.
  */
 function drawFibonacciCurve(ctx, w, h, color, NUM) {
   const curveColor = color || "#e8e8f0"; // ensures spiral stays visible even with short palettes
@@ -151,20 +150,20 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
 }
 
 /**
- * Render a static double-helix lattice: two phase-shifted sinusoidal strands with vertical crossbars.
+ * Render a static double-helix lattice: two phase-shifted sinusoidal strands across the canvas,
+ * connected by evenly spaced vertical crossbars.
  *
- * Draws two helical strands across the canvas width and connects them with evenly spaced vertical bars.
- * Scales to the provided canvas size and uses numeric constants from `NUM` to control resolution,
- * amplitude, phase, and crossbar spacing. Mutates the supplied CanvasRenderingContext2D (stroke-only).
+ * Scales to the provided width/height and draws stroked paths onto the supplied CanvasRenderingContext2D.
+ * Mutates the context (stroke operations). If `color` is falsy a neutral fallback "#e8e8f0" is used.
  *
  * @param {number} w - Canvas width in pixels.
  * @param {number} h - Canvas height in pixels.
- * @param {string} color - Stroke color for strands and crossbars; falls back to "#e8e8f0" if falsy.
- * @param {object} NUM - Numeric config with required properties:
- *                       ONEFORTYFOUR (total vertical steps),
- *                       TWENTYTWO (amplitude divisor),
- *                       ELEVEN (sine divisor for phase),
- *                       NINE (divisor used to compute crossbar spacing).
+ * @param {string} color - Stroke color for strands and crossbars; uses "#e8e8f0" when falsy.
+ * @param {object} NUM - Numeric configuration object with required properties:
+ *                       ONEFORTYFOUR (number of vertical steps),
+ *                       TWENTYTWO (amplitude divisor used to compute wave amplitude),
+ *                       ELEVEN (divisor controlling sine wavelength/phase rate),
+ *                       NINE (divisor used to derive crossbar spacing).
  */
 function drawHelixLattice(ctx, w, h, color, NUM) {
   const steps = NUM.ONEFORTYFOUR; // 144 vertical steps
