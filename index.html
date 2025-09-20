@@ -26,20 +26,188 @@
 
   <canvas id="stage" width="1440" height="900" aria-label="Layered sacred geometry canvas"></canvas>
   <p class="note">This static renderer encodes Vesica, Tree-of-Life, Fibonacci, and a static double-helix lattice. No animation, no autoplay, no external libs. Open this file directly.</p>
+    /* ND-safe palette + layout: calm contrast, no motion, generous spacing */
+    :root {
+      --bg:#0b0b12;
+      --ink:#e8e8f0;
+      --muted:#a6a6c1;
+      --outline:#1d1d2a;
+    }
+
+    html,
+    body {
+      margin:0;
+      padding:0;
+      min-height:100%;
+      background:var(--bg);
+      color:var(--ink);
+      font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    }
+
+    a {
+      color:inherit;
+    }
+
+    .skip-link {
+      position:absolute;
+      left:-999px;
+      top:auto;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+    }
+
+    .skip-link:focus {
+      left:16px;
+      top:12px;
+      width:auto;
+      height:auto;
+      padding:8px 12px;
+      background:#1d1d2a;
+      color:#f0f0ff;
+      border-radius:6px;
+      text-decoration:none;
+      box-shadow:0 0 0 2px rgba(240,240,255,0.35);
+    }
+
+    header {
+      padding:12px 16px;
+      border-bottom:1px solid var(--outline);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    h1 {
+      margin:0;
+      font-size:18px;
+      letter-spacing:0.3px;
+    }
+
+    .status {
+      margin:0;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    main {
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:16px;
+    }
+
+    #stage {
+      display:block;
+      width:1440px;
+      height:900px;
+      max-width:100%;
+      box-shadow:0 0 0 1px var(--outline);
+      background:var(--bg);
+    }
+
+    .note {
+      max-width:900px;
+      margin:0;
+      color:var(--muted);
+      text-align:center;
+    }
+
+    noscript {
+      max-width:900px;
+      padding:12px 16px;
+      border:1px solid var(--outline);
+      border-radius:6px;
+      background:#11111a;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to geometry</a>
+  <header>
+    <h1>Cosmic Helix Renderer — layered sacred geometry (offline, ND-safe)</h1>
+    <p class="status" id="status" role="status" aria-live="polite">Loading palette…</p>
+  </header>
+
+  <main id="main">
+    <canvas id="stage" width="1440" height="900" aria-label="Layered sacred geometry canvas" role="img"></canvas>
+    <p class="note">This static renderer encodes Vesica, Tree-of-Life, Fibonacci, and a static double-helix lattice. No motion, no external libraries. Open this file directly.</p>
+    <noscript>Enable JavaScript to draw the layered geometry. Without it the calm static illustration cannot render.</noscript>
+  </main>
 
   <script type="module">
     import { renderHelix } from "./js/helix-renderer.mjs";
 
-    const elStatus = document.getElementById("status");
+    const statusEl = document.getElementById("status");
     const canvas = document.getElementById("stage");
     const ctx = canvas.getContext("2d");
 
-    async function loadJSON(path) {
+    const defaults = {
+      palette: {
+        bg:"#0b0b12",
+        ink:"#e8e8f0",
+        layers:["#b1c7ff","#89f7fe","#a0ffa1","#ffd27f"]
+      }
+    };
+
+    const NUM = {
+      THREE:3,
+      SEVEN:7,
+      NINE:9,
+      ELEVEN:11,
+      TWENTYTWO:22,
+      THIRTYTHREE:33,
+      NINETYNINE:99,
+      ONEFORTYFOUR:144
+    };
+
+    if (!ctx) {
+      statusEl.textContent = "Canvas context unavailable; static illustration cannot render.";
+    } else {
+      init();
+    }
+
+    async function init() {
+      // ND-safe: announce palette source so readers know when the fallback engages
+      const paletteData = await loadPalette("./data/palette.json");
+      if (paletteData) {
+        const safePalette = sanitizePalette(paletteData, defaults.palette);
+        announce("Palette loaded from data/palette.json.");
+        renderHelix(ctx, {
+          width:canvas.width,
+          height:canvas.height,
+          palette:safePalette,
+          NUM
+        });
+      } else {
+        announce("Palette missing; using safe fallback stored inline.");
+        renderHelix(ctx, {
+          width:canvas.width,
+          height:canvas.height,
+          palette:defaults.palette,
+          NUM
+        });
+      }
+    }
+
+    function announce(message) {
+      statusEl.textContent = message;
+    }
+
+    async function loadPalette(path) {
       try {
         const res = await fetch(path, { cache: "no-store" });
         if (!res.ok) throw new Error(String(res.status));
         return await res.json();
       } catch (err) {
+        // Offline-first: fetches from local file if present; failures simply fall back.
+        const res = await fetch(path, { cache:"no-store" });
+        if (!res.ok) {
+          return null;
+        }
+        return await res.json();
+      } catch (error) {
         return null;
       }
     }
@@ -61,6 +229,31 @@
 
     // ND-safe rationale: no motion, high readability, soft colors, layered order
     renderHelix(ctx, { width:canvas.width, height:canvas.height, palette:active, NUM });
+    function sanitizePalette(input, fallback) {
+      if (!input || typeof input !== "object") {
+        return clonePalette(fallback);
+      }
+      const safe = {
+        bg:isHex(input.bg) ? input.bg : fallback.bg,
+        ink:isHex(input.ink) ? input.ink : fallback.ink,
+        layers:Array.isArray(input.layers) ? input.layers.filter(isHex) : []
+      };
+      while (safe.layers.length < 4) {
+        safe.layers.push(fallback.layers[safe.layers.length % fallback.layers.length]);
+      }
+      if (safe.layers.length > 4) {
+        safe.layers = safe.layers.slice(0, 4);
+      }
+      return safe;
+    }
+
+    function clonePalette(palette) {
+      return { bg:palette.bg, ink:palette.ink, layers:palette.layers.slice(0, 4) };
+    }
+
+    function isHex(value) {
+      return typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value);
+    }
   </script>
 </body>
 </html>

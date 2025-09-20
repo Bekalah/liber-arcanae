@@ -14,27 +14,60 @@
     - Soft contrast palette keeps focus gentle.
     - Pure functions highlight numerology constants.
 */
+// Per Texturas Numerorum, Spira Loquitur.
+/**
+ * Render a static, four-layer sacred-geometry composition onto a canvas.
+ *
+ * Clears the canvas, paints the background, configures rounded stroke rendering, ensures four layer colors
+ * (pads palette.layers with a neutral fallback if needed), and draws the layers in depth order:
+ * vesica field, tree-of-life scaffold, Fibonacci curve, and double-helix lattice.
+ *
+ * @param {Object} opts - Rendering options.
+ * @param {number} opts.width - Canvas width in pixels.
+ * @param {number} opts.height - Canvas height in pixels.
+ * @param {Object} opts.palette - Color palette; must include `bg` and `layers` (an array of layer colors).
+ * @param {Object} opts.NUM - Numerology constants used by the internal draw routines.
+ */
 
 export function renderHelix(ctx, opts) {
   const { width, height, palette, NUM } = opts;
+  const colors = palette.layers.slice(0, 4);
+  while (colors.length < 4) {
+    colors.push("#e8e8f0"); // guardrail ensures all four layers render even if palette is short
+  }
+  const [vesicaColor, treeColor, fibonacciColor, helixColor] = colors;
+
   ctx.clearRect(0, 0, width, height);
-  // ND-safe: fill background first to avoid flashes
+  // ND-safe: paint background immediately to avoid flashes during render.
   ctx.fillStyle = palette.bg;
   ctx.fillRect(0, 0, width, height);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
 
-  // Layer order preserves depth: base geometry first, lattice last
-  drawVesica(ctx, width, height, palette.layers[0], NUM);
-  drawTreeOfLife(ctx, width, height, palette.layers[1], NUM);
-  drawFibonacciCurve(ctx, width, height, palette.layers[2], NUM);
-  drawHelixLattice(ctx, width, height, palette.layers[3], NUM);
+  // Layer order preserves depth: base geometry first, lattice last.
+  drawVesica(ctx, width, height, vesicaColor, NUM);
+  drawTreeOfLife(ctx, width, height, treeColor, NUM);
+  drawFibonacciCurve(ctx, width, height, fibonacciColor, NUM);
+  drawHelixLattice(ctx, width, height, helixColor, NUM);
 }
 
-// Layer 1: Vesica field using a 3x3 grid
+/**
+ * Render a 3×3 vesica field: two horizontally offset stroked circles centered in each grid cell.
+ *
+ * The function draws paired circles at the center of each cell in a 3×3 grid across the provided
+ * width/height on the given canvas context. Circle radius is computed from the minimum canvas
+ * dimension and NUM.NINE to maintain balanced spacing. If `color` is falsy a neutral fallback
+ * ("#e8e8f0") is used to preserve legibility.
+ *
+ * @param {string} color - Stroke color for the circles; fallback "#e8e8f0" is applied when falsy.
+ * @param {object} NUM - Numeric constants provider; the function reads NUM.THREE and NUM.NINE.
+ */
 function drawVesica(ctx, w, h, color, NUM) {
+  const strokeColor = color || "#e8e8f0"; // fallback keeps geometry legible if palette trims
   const cols = NUM.THREE;
   const rows = NUM.THREE;
   const r = Math.min(w, h) / NUM.NINE; // ND-safe: gentle radius balances the grid
-  ctx.strokeStyle = color;
+  ctx.strokeStyle = strokeColor;
   ctx.lineWidth = 2;
   for (let j = 0; j < rows; j++) {
     for (let i = 0; i < cols; i++) {
@@ -52,8 +85,9 @@ function drawVesica(ctx, w, h, color, NUM) {
 
 // Layer 2: Tree-of-Life scaffold with 10 nodes and 22 paths
 function drawTreeOfLife(ctx, w, h, color, NUM) {
-  ctx.strokeStyle = color;
-  ctx.fillStyle = color;
+  const tone = color || "#e8e8f0"; // calm ink fallback maintains contrast for nodes and paths
+  ctx.strokeStyle = tone;
+  ctx.fillStyle = tone;
   ctx.lineWidth = 1; // ND-safe: thin lines keep focus soft
 
   const nodes = [
@@ -92,12 +126,20 @@ function drawTreeOfLife(ctx, w, h, color, NUM) {
   }
 }
 
-// Layer 3: Fibonacci curve using 33 segments
+/**
+ * Render a Fibonacci (golden-ratio) spiral as a stroked path on the canvas.
+ *
+ * Draws a continuous spiral centered near (75% width, 30% height). Radius grows exponentially using the golden ratio; the curve is sampled in NUM.THIRTYTHREE steps and stroked.
+ *
+ * @param {string} [color] - Stroke color; falsy values fall back to "#e8e8f0".
+ * @param {object} NUM - Numeric constants required by the algorithm. Must include THIRTYTHREE, SEVEN, NINE, and NINETYNINE.
+ */
 function drawFibonacciCurve(ctx, w, h, color, NUM) {
+  const curveColor = color || "#e8e8f0"; // ensures spiral stays visible even with short palettes
   const phi = (1 + Math.sqrt(5)) / 2;
   const center = { x: w * 0.75, y: h * 0.3 };
   const scale = Math.min(w, h) / NUM.NINETYNINE;
-  ctx.strokeStyle = color;
+  ctx.strokeStyle = curveColor;
   ctx.lineWidth = 2;
   ctx.beginPath();
   for (let i = 0; i <= NUM.THIRTYTHREE; i++) {
@@ -111,11 +153,28 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
 }
 
 // Layer 4: Static double-helix lattice
+/**
+ * Render a static double-helix lattice: two phase-shifted sinusoidal strands across the canvas,
+ * connected by evenly spaced vertical crossbars.
+ *
+ * Scales to the provided width/height and draws stroked paths onto the supplied CanvasRenderingContext2D.
+ * Mutates the context (stroke operations). If `color` is falsy a neutral fallback "#e8e8f0" is used.
+ *
+ * @param {number} w - Canvas width in pixels.
+ * @param {number} h - Canvas height in pixels.
+ * @param {string} color - Stroke color for strands and crossbars; uses "#e8e8f0" when falsy.
+ * @param {object} NUM - Numeric configuration object with required properties:
+ *                       ONEFORTYFOUR (number of vertical steps),
+ *                       TWENTYTWO (amplitude divisor used to compute wave amplitude),
+ *                       ELEVEN (divisor controlling sine wavelength/phase rate),
+ *                       NINE (divisor used to derive crossbar spacing).
+ */
 function drawHelixLattice(ctx, w, h, color, NUM) {
   const steps = NUM.ONEFORTYFOUR; // 144 vertical steps
   const amp = h / NUM.NINE;
   const mid = h / 2;
-  ctx.strokeStyle = color;
+  const latticeColor = color || "#e8e8f0"; // static fallback preserves ladder visibility
+  ctx.strokeStyle = latticeColor;
   ctx.lineWidth = 1; // ND-safe: fine lines keep lattice subtle
 
   // strand A
