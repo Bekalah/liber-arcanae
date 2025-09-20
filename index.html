@@ -245,6 +245,89 @@
       }
     }
 
+    async function init() {
+      // ND-safe: announce palette source so readers know when the fallback engages
+      const paletteData = await loadPalette("./data/palette.json");
+      if (paletteData) {
+        const safePalette = sanitizePalette(paletteData, defaults.palette);
+        announce("Palette loaded from data/palette.json.");
+        renderHelix(ctx, {
+          width:canvas.width,
+          height:canvas.height,
+          palette:safePalette,
+          NUM
+        });
+      } else {
+        announce("Palette missing; using safe fallback stored inline.");
+        renderHelix(ctx, {
+          width:canvas.width,
+          height:canvas.height,
+          palette:defaults.palette,
+          NUM
+        });
+      }
+    }
+
+    function announce(message) {
+      statusEl.textContent = message;
+    }
+
+    async function loadPalette(path) {
+      try {
+        const res = await fetch(path, { cache: "no-store" });
+        if (!res.ok) throw new Error(String(res.status));
+        return await res.json();
+      } catch (err) {
+        // Offline-first: fetches from local file if present; failures simply fall back.
+        const res = await fetch(path, { cache:"no-store" });
+        if (!res.ok) {
+          return null;
+        }
+        return await res.json();
+      } catch (error) {
+        return null;
+      }
+    }
+
+    const defaults = {
+      palette: {
+        bg:"#0b0b12",
+        ink:"#e8e8f0",
+        layers:["#b1c7ff","#89f7fe","#a0ffa1","#ffd27f","#f5a3ff","#d0d0e6"]
+      }
+    };
+
+    const palette = await loadJSON("./data/palette.json");
+    const active = palette || defaults.palette;
+    elStatus.textContent = palette ? "Palette loaded." : "Palette missing; using safe fallback.";
+
+    // Numerology constants used by geometry routines
+    const NUM = { THREE:3, SEVEN:7, NINE:9, ELEVEN:11, TWENTYTWO:22, THIRTYTHREE:33, NINETYNINE:99, ONEFORTYFOUR:144 };
+
+    // ND-safe rationale: no motion, high readability, soft colors, layered order
+    renderHelix(ctx, { width:canvas.width, height:canvas.height, palette:active, NUM });
+    function sanitizePalette(input, fallback) {
+      if (!input || typeof input !== "object") {
+        return clonePalette(fallback);
+      }
+      const safe = {
+        bg:isHex(input.bg) ? input.bg : fallback.bg,
+        ink:isHex(input.ink) ? input.ink : fallback.ink,
+        layers:Array.isArray(input.layers) ? input.layers.filter(isHex) : []
+      };
+      while (safe.layers.length < 4) {
+        safe.layers.push(fallback.layers[safe.layers.length % fallback.layers.length]);
+      }
+      if (safe.layers.length > 4) {
+        safe.layers = safe.layers.slice(0, 4);
+      }
+      return safe;
+    }
+
+    function clonePalette(palette) {
+      return { bg:palette.bg, ink:palette.ink, layers:palette.layers.slice(0, 4) };
+    }
+
     function announce(message) {
       statusEl.textContent = message;
     }
