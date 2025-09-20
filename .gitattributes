@@ -1,9 +1,1 @@
-*.png  filter=lfs diff=lfs merge=lfs -text
-*.tif  filter=lfs diff=lfs merge=lfs -text
-*.tiff filter=lfs diff=lfs merge=lfs -text
-*.exr  filter=lfs diff=lfs merge=lfs -text
-*.hdr  filter=lfs diff=lfs merge=lfs -text
-*.webp filter=lfs diff=lfs merge=lfs -text
-*.psd  filter=lfs diff=lfs merge=lfs -text
-# Override broken LFS pointer for the removed Black Madonna asset
-img/black-madonna.png -filter -diff -merge
+# Git LFS disabled; image assets tracked as regular files.
