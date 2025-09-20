@@ -148,3 +148,121 @@ describe('palette robustness', () => {
     expect(clone).toEqual(palette);
   });
 });
+/* ------------------------------------------------------------
+   Additional unit tests to broaden coverage of helpers and invariants.
+   Testing library/framework note:
+   - These tests are runner-agnostic and work with Vitest or Jest (ESM) via the autodetect above.
+-------------------------------------------------------------*/
+
+describe('helpers: hexToRGB', () => {
+  it('parses extremes (#000000 and #ffffff)', () => {
+    expect(hexToRGB('#000000')).toEqual({ r: 0, g: 0, b: 0 });
+    expect(hexToRGB('#ffffff')).toEqual({ r: 255, g: 255, b: 255 });
+  });
+
+  it('parses mixed-case hex values', () => {
+    expect(hexToRGB('#AbCdEf')).toEqual({ r: 171, g: 205, b: 239 });
+  });
+
+  it('returns components within [0, 255] for all palette colors', () => {
+    const all = [palette.bg, palette.ink, ...palette.layers];
+    for (const h of all) {
+      const { r, g, b } = hexToRGB(h);
+      expect(r).toBeGreaterThanOrEqual(0);
+      expect(g).toBeGreaterThanOrEqual(0);
+      expect(b).toBeGreaterThanOrEqual(0);
+      expect(r).toBeLessThanOrEqual(255);
+      expect(g).toBeLessThanOrEqual(255);
+      expect(b).toBeLessThanOrEqual(255);
+    }
+  });
+
+  it('throws on invalid inputs (robustness)', () => {
+    const bad = ['#GGGGGG', '#123', '123456', '#abcd', '#1234567', '#12 456', null, undefined, 42, {}, []];
+    for (const s of bad) {
+      // @ts-ignore - we intentionally pass invalid types
+      expect(() => hexToRGB(s)).toThrow();
+    }
+  });
+});
+
+describe('helpers: srgbToLinear', () => {
+  it('maps 0 to ~0 and 255 to ~1', () => {
+    expect(srgbToLinear(0)).toBeCloseTo(0, 12);
+    expect(srgbToLinear(255)).toBeCloseTo(1, 6); // float rounding tolerance
+  });
+
+  it('respects the 0.03928 threshold branch (c=10 vs c=11)', () => {
+    const c10 = srgbToLinear(10); // 10/255 ~= 0.039215686 < 0.03928 -> linear segment
+    const c11 = srgbToLinear(11); // 11/255 > 0.03928 -> power segment
+
+    const exp10 = (10 / 255) / 12.92;
+    const exp11 = Math.pow(((11 / 255) + 0.055) / 1.055, 2.4);
+
+    expect(c10).toBeCloseTo(exp10, 8);
+    expect(c11).toBeCloseTo(exp11, 8);
+    expect(c11).toBeGreaterThan(c10);
+  });
+});
+
+describe('helpers: relLuminance', () => {
+  it('black has ~0 luminance and white has ~1 luminance', () => {
+    expect(relLuminance(hexToRGB('#000000'))).toBeCloseTo(0, 8);
+    expect(relLuminance(hexToRGB('#ffffff'))).toBeCloseTo(1, 6);
+  });
+
+  it('green > red > blue for primary colors (due to coefficients)', () => {
+    const Lr = relLuminance(hexToRGB('#ff0000'));
+    const Lg = relLuminance(hexToRGB('#00ff00'));
+    const Lb = relLuminance(hexToRGB('#0000ff'));
+    expect(Lg).toBeGreaterThan(Lr);
+    expect(Lr).toBeGreaterThan(Lb);
+  });
+});
+
+describe('contrast invariants', () => {
+  it('contrast ratio is symmetric and >= 1', () => {
+    const a = '#123456';
+    const b = '#abcdef';
+    const rab = contrastRatio(a, b);
+    const rba = contrastRatio(b, a);
+    expect(rab).toBeCloseTo(rba, 12);
+    expect(rab).toBeGreaterThanOrEqual(1);
+  });
+
+  it('bg contrasted with itself is ~1', () => {
+    expect(contrastRatio(palette.bg, palette.bg)).toBeCloseTo(1, 12);
+  });
+
+  it('invalid inputs propagate as errors from helpers', () => {
+    expect(() => contrastRatio('#123', palette.bg)).toThrow();
+    expect(() => contrastRatio(palette.ink, 'not-a-hex')).toThrow();
+  });
+});
+
+describe('palette additional semantics', () => {
+  it('bg is the darkest and ink is the lightest among all palette colors', () => {
+    const Lbg = relLuminance(hexToRGB(palette.bg));
+    const Link = relLuminance(hexToRGB(palette.ink));
+    const layerLs = palette.layers.map(h => relLuminance(hexToRGB(h)));
+
+    const minLayer = Math.min(...layerLs);
+    const maxLayer = Math.max(...layerLs);
+
+    expect(Lbg).toBeLessThan(minLayer);
+    expect(Link).toBeGreaterThan(maxLayer);
+  });
+
+  it('adjacent layers are not identical (strict inequality somewhere)', () => {
+    for (let i = 1; i < palette.layers.length; i++) {
+      expect(palette.layers[i].toLowerCase()).not.toBe(palette.layers[i - 1].toLowerCase());
+    }
+  });
+
+  it('cloning and mutating a clone does not mutate the original', () => {
+    const clone = JSON.parse(JSON.stringify(palette));
+    clone.layers[0] = '#000000';
+    expect(clone.layers[0]).toBe('#000000');
+    expect(palette.layers[0]).not.toBe('#000000');
+  });
+});

@@ -314,3 +314,111 @@ describe('index.html inline module', () => {
   });
 
 });
+// -----------------------------------------------------------------------------
+// Additional coverage focused on edge cases and failure modes
+// Testing framework note: This suite remains compatible with both Jest and Vitest
+// via the testApi harness at the top of this file.
+// -----------------------------------------------------------------------------
+
+describe('index.html inline module — extended coverage', () => {
+  beforeEach(() => {
+    resetDom();
+    globalThis.__mockRenderHelixImpl = null;
+  });
+  afterEach(() => {
+    if (global.fetch && (global.fetch.mockImplementation || global.fetch.mock)) {
+      try { global.fetch.mockClear(); } catch {}
+    }
+    delete global.fetch;
+    delete globalThis.__mockRenderHelixImpl;
+  });
+
+  it('isHex() rejects 3-digit shorthand and whitespace-padded values', async () => {
+    const { isHex } = await loadInlineModule();
+    expect(isHex('#fff')).toBe(false);
+    expect(isHex(' #abcdef ')).toBe(false);
+  });
+
+  it('clonePalette() does not mutate source object and trims layer count to 4', async () => {
+    const { clonePalette } = await loadInlineModule();
+    const src = {
+      bg: '#111111',
+      ink: '#222222',
+      layers: ['#111111', '#222222', '#333333', '#444444', '#555555']
+    };
+    const cloned = clonePalette(src);
+    // Mutate clone and verify source is unaffected
+    cloned.layers[0] = '#999999';
+    expect(src.layers[0]).toBe('#111111');
+    // Ensure at most 4 layers
+    expect(Array.isArray(cloned.layers)).toBe(true);
+    expect(cloned.layers).toHaveLength(4);
+  });
+
+  it('sanitizePalette() tolerates non-array layers, preserves valid bg/ink, and outputs 4 valid hex layers', async () => {
+    const { sanitizePalette, isHex } = await loadInlineModule();
+    const fallback = { bg: '#0b0b12', ink: '#e8e8f0', layers: ['#b1c7ff','#89f7fe','#a0ffa1','#ffd27f'] };
+
+    const input = { bg: '#101010', ink: '#202020', layers: 'oops' };
+    const out = sanitizePalette(input, fallback);
+
+    expect(out.bg).toBe('#101010');
+    expect(out.ink).toBe('#202020');
+    expect(out.layers).toHaveLength(4);
+    out.layers.forEach(c => expect(isHex(c)).toBe(true));
+  });
+
+  it('init() sanitizes an invalid fetched palette before rendering and still announces success', async () => {
+    resetDom();
+    installCanvasStub();
+
+    const badFetched = { bg: 'oops', ink: '#1a2b3c', layers: ['oops', '#111111'] };
+    mockFetchSuccess(badFetched);
+
+    // capture calls to renderHelix
+    globalThis.__mockRenderHelixImpl = () => {};
+
+    const mod = await loadInlineModule();
+    await mod.init();
+
+    // success announcement still expected even if data required sanitization
+    const status = document.getElementById('status');
+    expect(status.textContent).toBe('Palette loaded from data/palette.json.');
+
+    // verify render call used sanitized palette
+    expect(mod.__calls__).toBeDefined();
+    expect(mod.__calls__.length).toBe(1);
+    const p = mod.__calls__[0].args.palette;
+
+    expect(mod.isHex(p.bg)).toBe(true);
+    expect(p.bg).not.toBe('oops'); // sanitized
+    expect(mod.isHex(p.ink)).toBe(true);
+    expect(Array.isArray(p.layers)).toBe(true);
+    expect(p.layers).toHaveLength(4);
+    p.layers.forEach(c => expect(mod.isHex(c)).toBe(true));
+  });
+
+  it('top-level: when 2D context is null, announces inability and does not invoke renderHelix or fetch/init', async () => {
+    resetDom();
+    const canvas = document.getElementById('stage');
+    canvas.getContext = () => null; // force unavailability
+
+    // Spy on fetch to ensure it is not touched when ctx is unavailable
+    const fetchSpy = (vi ? vi.fn() : jest.fn());
+    global.fetch = fetchSpy;
+
+    const mod = await loadInlineModule(); // triggers top-level branch evaluation
+
+    const status = document.getElementById('status');
+    expect(status.textContent).toBe('Canvas context unavailable; static illustration cannot render.');
+
+    // No render attempts should occur
+    expect(mod.__calls__).toBeDefined();
+    expect(mod.__calls__.length).toBe(0);
+
+    // And no network activity either
+    if (fetchSpy && fetchSpy.mock) {
+      expect(fetchSpy).not.toHaveBeenCalled();
+    }
+  });
+});
