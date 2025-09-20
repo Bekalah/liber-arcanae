@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Cosmic Helix Renderer (ND-safe, Offline)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="dark light">
+  <style>
+    /* ND-safe: calm contrast, layered spacing, no motion */
+    :root { --bg:#0b0b12; --ink:#e8e8f0; --muted:#a6a6c1; --accent:#b1c7ff; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; background:var(--bg); color:var(--ink); font:15px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+    header { padding:16px 24px; border-bottom:1px solid #1d1d2a; }
+    h1 { margin:0 0 4px 0; font-size:1.4rem; }
+    main { padding:24px; display:grid; gap:32px; }
+    section { max-width:960px; }
+    canvas { display:block; width:100%; height:auto; border:1px solid #1d1d2a; box-shadow:0 0 0 1px rgba(255,255,255,0.05); }
+    .status { color:var(--muted); font-size:0.8rem; margin-top:4px; }
+    #hero-art { min-height:24px; margin-top:12px; }
+    .note { margin-top:12px; color:var(--muted); font-size:0.9rem; }
+    footer { padding:16px 24px; border-top:1px solid #1d1d2a; color:var(--muted); font-size:0.85rem; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cosmic Helix Renderer — offline sacred geometry field</h1>
+    <p class="status" id="status">Loading palette…</p>
+    <p class="status" id="hero-status">Preparing WEBP altar…</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Layered cosmology canvas</h2>
+      <p class="note">The 1440×900 canvas renders Vesica geometry, Tree-of-Life nodes, a Fibonacci curve, and a static double-helix lattice. No animation; all depth is layered gently for ND-safe viewing.</p>
+      <canvas id="stage" width="1440" height="900" aria-label="Layered sacred geometry canvas"></canvas>
+    </section>
+
+    <section>
+      <h2>Hero altar (WEBP-first)</h2>
+      <p class="note">An octagram fallback paints immediately; the manifest then invites the WEBP hero art. PNG masters stay offline.</p>
+      <canvas id="opus" width="1200" height="675" aria-label="Opalescent octagram field"></canvas>
+      <div id="hero-art" aria-live="polite">WEBP hero loading…</div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Offline-first: open this file directly. Palette and manifest fall back safely if the JSON files are absent.</p>
+  </footer>
+
+  <script type="module">
+    import { renderHelix } from "./js/helix-renderer.mjs";
+    import { paintOctagram } from "./assets/js/first-paint-octagram.js";
+    import { mountArt } from "./assets/js/art-loader.js";
+
+    const statusEl = document.getElementById("status");
+    const heroStatusEl = document.getElementById("hero-status");
+    const heroHost = document.getElementById("hero-art");
+    const stage = document.getElementById("stage");
+    const ctx = stage.getContext("2d");
+
+    const fallbackPalette = {
+      bg: "#0b0b12",
+      ink: "#e8e8f0",
+      layers: ["#b1c7ff", "#89f7fe", "#a0ffa1", "#ffd27f", "#f5a3ff", "#d0d0e6"]
+    };
+
+    const NUM = {
+      THREE: 3,
+      SEVEN: 7,
+      NINE: 9,
+      ELEVEN: 11,
+      TWENTYTWO: 22,
+      THIRTYTHREE: 33,
+      NINETYNINE: 99,
+      ONEFORTYFOUR: 144
+    };
+
+    function setStatus(el, message){
+      if (el) el.textContent = message;
+    }
+
+    const paletteModule = import("./data/palette.json", { assert: { type: "json" } })
+      .then(mod => mod.default)
+      .catch(() => null);
+
+    const palette = await paletteModule;
+    if (palette){
+      setStatus(statusEl, "Palette loaded from data/palette.json.");
+    } else {
+      setStatus(statusEl, "Palette missing; using embedded fallback.");
+    }
+
+    renderHelix(ctx, {
+      width: stage.width,
+      height: stage.height,
+      palette: palette || fallbackPalette,
+      NUM
+    });
+
+    paintOctagram();
+    setStatus(heroStatusEl, "Summoning WEBP hero…");
+
+    heroHost?.addEventListener("hero-status", event => {
+      const detail = event.detail;
+      if (detail === "mounted"){
+        setStatus(heroStatusEl, "WEBP hero mounted.");
+      } else if (detail === "manifest-missing"){
+        setStatus(heroStatusEl, "Hero manifest missing; octagram holds the gate.");
+      } else if (detail === "hero-error"){
+        setStatus(heroStatusEl, "WEBP asset missing; octagram maintains first paint.");
+      }
+    });
+
+    const outcome = await mountArt();
+    if (outcome === "no-host"){
+      setStatus(heroStatusEl, "Hero container missing; octagram only.");
+    } else if (outcome === "manifest-missing"){
+      setStatus(heroStatusEl, "Hero manifest missing; octagram holds the gate.");
+    } else if (outcome !== "mounted"){
+      setStatus(heroStatusEl, "Awaiting WEBP response; octagram steady.");
+    }
+  </script>
+</body>
+</html>

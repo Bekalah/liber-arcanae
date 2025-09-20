@@ -1,19 +1,26 @@
 # Cathedral of Circuits Modular Foundation
 
-## Structure
-- `index.html`: Main entry point, loads nodes from `/data/nodes.json`.
-- `/data/nodes.json`: All "nodes" (cards, labs, lore) as modular JSON objects.
-- `/img/`: Art and icons for each node.
-- `/labs/`: Each node's interactive lab (HTML mini-apps).
-- `/js/loadNodes.js`: Loads nodes and builds the UI.
-- `style.css`: Styles the site.
+## Offline cosmic renderer
+- `index.html`: Offline-first helix renderer with WEBP hero loader.
+- `/js/helix-renderer.mjs`: Draws Vesica field, Tree-of-Life, Fibonacci curve, and double-helix lattice.
+- `/assets/js/first-paint-octagram.js`: ND-safe first paint for the hero altar.
+- `/assets/js/art-loader.js`: Fetches `/assets/art/manifest.json` and mounts WEBP art.
 
-## How to Add Content
-- Add a new node to `/data/nodes.json`.
-- (Optional) Add art to `/img/`.
-- (Optional) Add a lab to `/labs/`.
-- All logic is modular - just update JSON, no code changes needed!
+## Data + palette
+- `/data/nodes.json`: Modular nodes for other site interfaces.
+- `/data/palette.json`: Preferred ND-safe palette; index falls back gracefully if missing.
+- `/assets/art/manifest.json`: Declares WEBP hero art (`black-madonna-altar-1600.webp`). Keep PNG masters offline.
 
-## Safety
-- Commit often and push to GitHub to avoid data loss.
-- Keep everything modular for easy recovery and expansion.
+## Safety + guards
+- PNG ghosts are ignored via `.gitignore` and blocked by `scripts/verify-absent.mjs` (wired to `npm run prebuild`).
+- Set Netlify `GIT_LFS_SKIP_SMUDGE=1` so deployments skip PNG resurrection.
+- `core/health-check.html`: Quick page to confirm build time and detect auth gates.
+
+## Scripts
+```sh
+npm run prebuild   # PROTECT charter — forbids tracked PNG ghosts
+npm run build      # Placeholder entry (vite build) for future bundlers
+npm test           # Schema guard for interface data
+```
+
+Everything remains modular and offline-friendly. Add new lore by updating the JSON files or by extending the renderer modules with additional static layers.
