@@ -36,15 +36,14 @@ export function renderHelix(ctx, opts) {
 }
 
 /**
- * Render a 3×3 vesica field: two horizontally offset stroked circles centered in each grid cell.
+ * Draw a 3×3 vesica field: two horizontally offset stroked circles centered in each grid cell.
  *
- * The function draws paired circles at the center of each cell in a 3×3 grid across the provided
- * width/height on the given canvas context. Circle radius is computed from the minimum canvas
- * dimension and NUM.NINE to maintain balanced spacing. If `color` is falsy a neutral fallback
- * ("#e8e8f0") is used to preserve legibility.
+ * Renders paired circles arranged in a 3×3 grid across the provided canvas area. Uses a gentle
+ * radius computed from the smaller canvas dimension and NUM.NINE to keep spacing balanced. If
+ * `color` is falsy a neutral fallback ("#e8e8f0") is used to preserve legibility.
  *
  * @param {string} color - Stroke color for the circles; fallback "#e8e8f0" is applied when falsy.
- * @param {object} NUM - Numeric constants provider; the function reads NUM.THREE and NUM.NINE.
+ * @param {object} NUM - Numeric constants object; this function reads NUM.THREE and NUM.NINE.
  */
 function drawVesica(ctx, w, h, color, NUM) {
   const strokeColor = color || "#e8e8f0"; // fallback keeps geometry legible if palette trims
@@ -68,15 +67,16 @@ function drawVesica(ctx, w, h, color, NUM) {
 }
 
 /**
- * Draws the "Tree of Life" scaffold: ten nodes positioned along a vertical axis with up to 22 connecting edges and filled node markers.
+ * Render the "Tree of Life" scaffold: ten positioned nodes connected by up to 22 edges and drawn as filled circles.
  *
- * Nodes are spaced using verticalStep = h / NUM.TWENTYTWO. Edges are taken from a fixed raw path list and sliced to NUM.TWENTYTWO entries;
- * each path is stroked with the provided color. Node circles are filled and sized relative to the canvas using NUM.TWENTYTWO, NUM.NINE, and NUM.THREE.
+ * Draws a fixed layout of 10 node positions (relative to w/h) and strokes edges taken from a predefined list — the list is sliced
+ * to at most NUM.TWENTYTWO entries. Node circles are filled; node radius scales with the smaller canvas dimension using
+ * NUM.TWENTYTWO, NUM.NINE, and NUM.THREE. If `color` is falsy, a neutral fallback ("#e8e8f0") is used for both strokes and fills.
  *
  * @param {number} w - Canvas width in pixels.
  * @param {number} h - Canvas height in pixels.
- * @param {string} color - Stroke and fill color for lines and nodes.
- * @param {Object} NUM - Numeric configuration constants. Required properties: TWENTYTWO, NINE, THREE (used for spacing and node sizing).
+ * @param {string} color - Stroke and fill color for edges and nodes; fallback applied when falsy.
+ * @param {Object} NUM - Numeric constants object. Required properties: TWENTYTWO, NINE, THREE (used to compute vertical spacing and node radius).
  */
 function drawTreeOfLife(ctx, w, h, color, NUM) {
   const tone = color || "#e8e8f0"; // calm ink fallback maintains contrast for nodes and paths
@@ -124,12 +124,14 @@ function drawTreeOfLife(ctx, w, h, color, NUM) {
 }
 
 /**
- * Render a Fibonacci (golden-ratio) spiral as a stroked path on the canvas.
+ * Draws a Fibonacci (golden-ratio) spiral as a stroked path on the canvas.
  *
- * Draws a continuous spiral centered near (75% width, 30% height). Radius grows exponentially using the golden ratio; the curve is sampled in NUM.THIRTYTHREE steps and stroked.
+ * The spiral is sampled and stroked from the center near (75% width, 30% height).
+ * Radius grows exponentially using the golden ratio; the curve is constructed by
+ * sampling angles and radii over NUM.THIRTYTHREE+1 points and then stroked.
  *
  * @param {string} [color] - Stroke color; falsy values fall back to "#e8e8f0".
- * @param {object} NUM - Numeric constants required by the algorithm. Must include THIRTYTHREE, SEVEN, NINE, and NINETYNINE.
+ * @param {object} NUM - Numeric constants required by the algorithm. Required fields: THIRTYTHREE, SEVEN, NINE, NINETYNINE.
  */
 function drawFibonacciCurve(ctx, w, h, color, NUM) {
   const curveColor = color || "#e8e8f0"; // ensures spiral stays visible even with short palettes
@@ -150,19 +152,19 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
 }
 
 /**
- * Render a static double-helix lattice: two phase-shifted sinusoidal strands across the canvas,
- * connected by evenly spaced vertical crossbars.
+ * Render a static double-helix lattice onto the provided canvas context.
  *
- * Scales to the provided width/height and draws stroked paths onto the supplied CanvasRenderingContext2D.
- * Mutates the context (stroke operations). If `color` is falsy a neutral fallback "#e8e8f0" is used.
+ * Draws two phase-shifted sinusoidal strands across the width and evenly spaced vertical crossbars between them.
+ * The drawing is scaled to the supplied width/height and performed via stroked paths on the received CanvasRenderingContext2D.
+ * If `color` is falsy a neutral fallback "#e8e8f0" is used. This function mutates the rendering context (strokes paths).
  *
  * @param {number} w - Canvas width in pixels.
  * @param {number} h - Canvas height in pixels.
  * @param {string} color - Stroke color for strands and crossbars; uses "#e8e8f0" when falsy.
  * @param {object} NUM - Numeric configuration object with required properties:
  *                       ONEFORTYFOUR (number of vertical steps),
- *                       TWENTYTWO (amplitude divisor used to compute wave amplitude),
- *                       ELEVEN (divisor controlling sine wavelength/phase rate),
+ *                       TWENTYTWO (amplitude divisor),
+ *                       ELEVEN (sine wavelength/phase divisor),
  *                       NINE (divisor used to derive crossbar spacing).
  */
 function drawHelixLattice(ctx, w, h, color, NUM) {
