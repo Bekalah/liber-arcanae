@@ -1,16 +1,16 @@
 // Per Texturas Numerorum, Spira Loquitur.
 /**
- * Render a static, four-layer sacred-geometry composition onto a canvas.
+ * Render a static four-layer sacred-geometry composition onto a canvas.
  *
- * Clears the canvas, paints the background, configures rounded stroke rendering, ensures four layer colors
- * (pads palette.layers with a neutral fallback if needed), and draws the layers in depth order:
- * vesica field, tree-of-life scaffold, Fibonacci curve, and double-helix lattice.
+ * Clears the canvas, fills the background with palette.bg, sets rounded stroke rendering,
+ * ensures four layer colors (pads palette.layers with the neutral fallback "#e8e8f0" if needed),
+ * and draws, in depth order, the vesica field, tree-of-life scaffold, Fibonacci curve, and double-helix lattice.
  *
  * @param {Object} opts - Rendering options.
  * @param {number} opts.width - Canvas width in pixels.
  * @param {number} opts.height - Canvas height in pixels.
  * @param {Object} opts.palette - Color palette; must include `bg` and `layers` (an array of layer colors).
- * @param {Object} opts.NUM - Numerology constants used by the internal draw routines.
+ * @param {Object} opts.NUM - Numerology constants consumed by the internal draw routines.
  */
 
 export function renderHelix(ctx, opts) {
@@ -36,11 +36,11 @@ export function renderHelix(ctx, opts) {
 }
 
 /**
- * Draw a 3×3 vesica field: two horizontally offset stroked circles centered in each grid cell.
+ * Draws a 3×3 vesica field: two horizontally offset stroked circles in each grid cell.
  *
- * Renders paired circles arranged in a 3×3 grid across the provided canvas area. Uses a gentle
- * radius computed from the smaller canvas dimension and NUM.NINE to keep spacing balanced. If
- * `color` is falsy a neutral fallback ("#e8e8f0") is used to preserve legibility.
+ * Uses a radius based on the smaller canvas dimension (min(w, h) / NUM.NINE) and places
+ * the paired circles centered inside each cell of a 3×3 grid. If `color` is falsy, a neutral
+ * fallback "#e8e8f0" is used for the stroke to preserve legibility.
  *
  * @param {string} color - Stroke color for the circles; fallback "#e8e8f0" is applied when falsy.
  * @param {object} NUM - Numeric constants object; this function reads NUM.THREE and NUM.NINE.
@@ -154,13 +154,12 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
 /**
  * Render a static double-helix lattice onto the provided canvas context.
  *
- * Draws two phase-shifted sinusoidal strands across the width and evenly spaced vertical crossbars between them.
- * The drawing is scaled to the supplied width/height and performed via stroked paths on the received CanvasRenderingContext2D.
- * If `color` is falsy a neutral fallback "#e8e8f0" is used. This function mutates the rendering context (strokes paths).
+ * Draws two phase-shifted sinusoidal strands across the canvas width and evenly spaced
+ * vertical crossbars between them. The drawing is scaled to the supplied width/height
+ * and performed via stroked paths on the given CanvasRenderingContext2D; the context's
+ * strokeStyle and lineWidth are mutated.
  *
- * @param {number} w - Canvas width in pixels.
- * @param {number} h - Canvas height in pixels.
- * @param {string} color - Stroke color for strands and crossbars; uses "#e8e8f0" when falsy.
+ * @param {string} color - Stroke color for strands and crossbars; falls back to "#e8e8f0" when falsy.
  * @param {object} NUM - Numeric configuration object with required properties:
  *                       ONEFORTYFOUR (number of vertical steps),
  *                       TWENTYTWO (amplitude divisor),
