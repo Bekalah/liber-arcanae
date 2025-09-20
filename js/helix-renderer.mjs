@@ -2,15 +2,17 @@
 /**
  * Render a static, four-layer sacred-geometry composition onto a canvas.
  *
- * Clears the canvas, paints the background, configures rounded stroke rendering, ensures four layer colors
- * (pads palette.layers with a neutral fallback if needed), and draws the layers in depth order:
- * vesica field, tree-of-life scaffold, Fibonacci curve, and double-helix lattice.
+ * Ensures exactly four layer colors by taking the first four entries of `opts.palette.layers`
+ * and padding with the neutral fallback `#e8e8f0` when necessary. Clears the canvas, fills the
+ * background with `opts.palette.bg`, configures rounded stroke rendering, then draws layers
+ * in depth order: vesica field, Tree of Life scaffold, Fibonacci curve, and double-helix lattice.
  *
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D rendering context to draw into.
  * @param {Object} opts - Rendering options.
  * @param {number} opts.width - Canvas width in pixels.
  * @param {number} opts.height - Canvas height in pixels.
- * @param {Object} opts.palette - Color palette; must include `bg` and `layers` (an array of layer colors).
- * @param {Object} opts.NUM - Numerology constants used by the internal draw routines.
+ * @param {Object} opts.palette - Color palette; must include `bg` and `layers` (array of layer colors).
+ * @param {Object} opts.NUM - Numerology constants consumed by the internal draw routines.
  */
 
 export function renderHelix(ctx, opts) {
@@ -124,12 +126,12 @@ function drawTreeOfLife(ctx, w, h, color, NUM) {
 }
 
 /**
- * Draws a static Fibonacci (golden-ratio) spiral onto the provided canvas context.
+ * Render a static Fibonacci (golden-ratio) spiral onto the canvas.
  *
- * Renders a stroked spiral centered at ~(75% width, 30% height) using 33 segments. The drawing
- * uses the golden ratio to exponentially increase radius with each segment.
+ * Draws a stroked spiral centered near (75% width, 30% height). Radius grows exponentially
+ * using the golden ratio; the path is drawn with 33 segments (inclusive).
  *
- * @param {string} [color] - Stroke color for the curve. Defaults to "#e8e8f0" when falsy.
+ * @param {string} [color] - Stroke color for the curve. Falls back to "#e8e8f0" when falsy.
  * @param {object} NUM - Numeric constants object. Required keys: THIRTYTHREE, SEVEN, NINE, NINETYNINE.
  */
 function drawFibonacciCurve(ctx, w, h, color, NUM) {
@@ -151,19 +153,17 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
 }
 
 /**
- * Render a static double-helix lattice: two phase-shifted sinusoidal strands with vertical crossbars.
+ * Draws a static double-helix lattice — two phase-shifted sinusoidal strands connected by vertical crossbars — onto the provided canvas context.
  *
- * Draws two helical strands across the canvas width and connects them with evenly spaced vertical bars.
- * Scales to the provided canvas size and uses numeric constants from `NUM` to control resolution,
- * amplitude, phase, and crossbar spacing. Mutates the supplied CanvasRenderingContext2D (stroke-only).
+ * Scales to the given width and height, uses numeric constants from `NUM` to control resolution, amplitude, phase, and crossbar spacing, and mutates the supplied CanvasRenderingContext2D by stroking paths. If `color` is falsy the function falls back to "#e8e8f0".
  *
  * @param {number} w - Canvas width in pixels.
  * @param {number} h - Canvas height in pixels.
- * @param {string} color - Stroke color for strands and crossbars; falls back to "#e8e8f0" if falsy.
- * @param {object} NUM - Numeric config with required properties:
- *                       ONEFORTYFOUR (total vertical steps),
+ * @param {string} color - Stroke color for strands and crossbars; falls back to "#e8e8f0" when falsy.
+ * @param {object} NUM - Numeric configuration object expected to contain:
+ *                       ONEFORTYFOUR (total steps),
  *                       TWENTYTWO (amplitude divisor),
- *                       ELEVEN (sine divisor for phase),
+ *                       ELEVEN (sine phase divisor),
  *                       NINE (divisor used to compute crossbar spacing).
  */
 function drawHelixLattice(ctx, w, h, color, NUM) {
