@@ -220,6 +220,35 @@
       statusEl.textContent = message;
     }
 
+    }
+
+    async function init() {
+      // ND-safe: announce palette source so readers know when the fallback engages
+      const paletteData = await loadPalette("./data/palette.json");
+      if (paletteData) {
+        const safePalette = sanitizePalette(paletteData, defaults.palette);
+        announce("Palette loaded from data/palette.json.");
+        renderHelix(ctx, {
+          width:canvas.width,
+          height:canvas.height,
+          palette:safePalette,
+          NUM
+        });
+      } else {
+        announce("Palette missing; using safe fallback stored inline.");
+        renderHelix(ctx, {
+          width:canvas.width,
+          height:canvas.height,
+          palette:defaults.palette,
+          NUM
+        });
+      }
+    }
+
+    function announce(message) {
+      statusEl.textContent = message;
+    }
+
     async function loadPalette(path) {
       try {
         const res = await fetch(path, { cache: "no-store" });
