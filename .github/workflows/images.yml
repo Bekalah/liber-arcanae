@@ -1,0 +1,22 @@
+name: images
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'assets/originals/**'
+      - 'scripts/optimize.mjs'
+      - 'scripts/dupes.mjs'
+      - 'schemas/asset.schema.json'
+      - 'package.json'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: node scripts/dupes.mjs
+      - run: node scripts/optimize.mjs
+      - run: npx ajv -s schemas/asset.schema.json -d assets/ASSET_CATALOG.json --spec=draft2020

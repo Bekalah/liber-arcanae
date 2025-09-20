@@ -5,9 +5,12 @@
     "type": "archetype",
     "numerology": 0,
     "lore": "Primordial Void; Holy Fool.",
-    "art": "img/black-madonna.png",
+    "art": "img/black-madonna.webp",
     "lab": "labs/void-lab.html",
-    "links": ["01-magician"]
+    "links": ["01-magician"],
+    "tags": ["origin", "aurora-gate"],
+    "provenance": ["Codex 144:99"],
+    "updated": "2024-06-01"
   },
   {
     "id": "01-magician",
@@ -17,6 +20,9 @@
     "lore": "Master of manifestation and will.",
     "art": "",
     "lab": "",
-    "links": ["00-void"]
+    "links": ["00-void"],
+    "tags": ["major-arcana"],
+    "provenance": ["Codex 144:99"],
+    "updated": "2024-06-01"
   }
 ]
