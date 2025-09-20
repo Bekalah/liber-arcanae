@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "node scripts/verify-absent.mjs",
+    "build": "vite build",
     "test": "node tests/interface.test.js"
   }
 }
