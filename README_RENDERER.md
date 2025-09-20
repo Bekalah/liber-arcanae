@@ -2,23 +2,18 @@ Per Texturas Numerorum, Spira Loquitur.
 
 # Cosmic Helix Renderer
 
-Static, ND-safe HTML5 canvas renderer for layered sacred geometry. Open [index.html](./index.html) directly in any modern browser; no build tools, servers, or workflows are required.
+Static, ND-safe HTML5 canvas renderer for layered sacred geometry. Open [index.html](./index.html) directly in a browser; no build steps or network requests.
 
-## Layer Order (depth preserved)
-1. **Vesica field** — intersecting circles on a triadic grid.
-2. **Tree-of-Life scaffold** — ten sephirot with twenty-two connecting paths.
-3. **Fibonacci curve** — fixed logarithmic spiral honoring natural growth.
-4. **Double-helix lattice** — two phase-shifted strands bound by calm crossbars.
+## Layers
+1. **Vesica field** – intersecting circles laid out with the constant 3.
+2. **Tree-of-Life** – ten sephirot with twenty-two connecting paths.
+3. **Fibonacci curve** – fixed logarithmic spiral honoring natural growth.
+4. **Double-helix lattice** – two phase-shifted strands with calm crossbars.
 
-Each layer draws with the next tone from [`data/palette.json`](./data/palette.json). If that file is absent, the page reports a gentle inline notice and renders with a built-in fallback palette so the geometry remains visible.
+Each layer uses the next color from [`data/palette.json`](./data/palette.json). If the palette file is missing, a calm inline status notice appears and the renderer falls back to built-in hues.
 
-## Numerology as Geometry Grammar
-The routines respect the requested constants: **3**, **7**, **9**, **11**, **22**, **33**, **99**, and **144**. They govern grid counts, spacing, and sample steps so the output stays faithful to the Cathedral canon while remaining static.
-
-## Local Use (offline)
-1. Double-click [index.html](./index.html).
-2. The 1440×900 canvas renders immediately, pulling data only from local files.
-3. Optional: adjust hues in [`data/palette.json`](./data/palette.json) while keeping six calm tones (`bg`, `ink`, and four-or-more `layers`).
+## Numerology as Spiral Grammar
+The constants of the Cathedral are Fibonacci-coded checkpoints rather than flat decoration:
 
 - **21 pillars** – a Fibonacci node (8 + 13) aligning to Tarot majors and 21 Taras.
 - **33 spine** – triple elevens forming the Christic ladder.
@@ -32,19 +27,13 @@ Geometry routines in this renderer reference sacred numbers 3, 7, 9, 11, 22, 33,
 
 ## Local Use
 Double-click [index.html](./index.html) in any modern browser. The 1440×900 canvas renders immediately with no network calls.
-The renderer depends on [`js/helix-renderer.mjs`](./js/helix-renderer.mjs) and optional [`data/palette.json`](./data/palette.json).
-Everything runs offline. The Pantheon atlas at the top of the page remains intact; the helix canvas sits beneath the node catalogue and shares the Calm Mode toggle for consistent softening.
+The renderer depends on [`js/helix-renderer.mjs`](./js/helix-renderer.mjs) and optional [`data/palette.json`](./data/palette.json); if the palette is missing or blocked by `file://` security, the inline fallback keeps the experience calm.
+Everything runs offline.
 
 ## ND-safe Notes
 - No motion or flashing; all elements render statically in layer order.
-- Palette uses gentle contrast for readability, with Calm Mode softening hues when toggled or when the OS requests reduced motion. Status text clarifies when fallbacks are engaged.
+- Palette uses gentle contrast for readability and honors reduced-motion preferences by avoiding animation entirely.
 - Skip link, `<main>` landmark, and status messaging keep the page navigable by keyboard and assistive tech.
 - Pure functions, ES modules, UTF-8, and LF newlines.
 - Palette file can be edited offline to adjust hues; the page falls back to built-in colors if it's missing and surfaces a small inline notice.
 
-
-## ND-safe Guarantees
-- No animation, autoplay, flashes, or motion scripting—`renderHelix` runs once per load.
-- Gentle contrast palette with clear outlines; fallback stays within the same tonal family.
-- Inline comments document why layer order, numerology, and calm defaults are preserved.
-- Pure ES modules, ASCII quotes, UTF-8, LF newlines, and small focused functions.
