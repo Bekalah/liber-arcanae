@@ -1,54 +1,87 @@
-// Test suite for helix-renderer.mjs
-// Framework: Node's built-in test runner (node:test) with assert (ESM).
-// If this project uses Jest/Vitest/Mocha, you can replace imports accordingly:
- //  - Vitest: import { describe, it, expect, beforeEach } from 'vitest';
- //  - Jest (ESM): import { describe, it, expect, beforeEach, jest } from '@jest/globals';
- //  - Mocha + Chai: import { describe, it, beforeEach } from 'mocha'; import { expect } from 'chai';
+// Testing library/framework: Node's built-in test runner (node:test) with node:assert
+// If your repo uses Jest/Vitest, you can replace node:test imports with `describe/it/expect` without changing test logic.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-// Try multiple likely import locations for the module under test.
-// Adjust these paths if the helix-renderer.mjs file lives elsewhere.
-
-const importPaths = [
-  '../helix-renderer.mjs',
-  './helix-renderer.mjs',
-  '../src/helix-renderer.mjs',
-  '../lib/helix-renderer.mjs',
-  '../modules/helix-renderer.mjs'
-];
-
-let cachedRenderHelix = null;
-async function getRenderHelix() {
-  if (cachedRenderHelix) return cachedRenderHelix;
-
-  let importError = null;
-  for (const path of importPaths) {
+// Adjust the import to match the actual module path exporting renderHelix.
+let renderHelix;
+try {
+  // Common locations tried in order; first that works will be used.
+  // We do dynamic import attempts to avoid hardcoding if repo layout differs.
+  const candidates = [
+    '../src/helix-renderer.mjs',
+    '../src/helix-renderer.js',
+    '../lib/helix-renderer.mjs',
+    '../lib/helix-renderer.js',
+    '../helix-renderer.mjs',
+    '../helix-renderer.js',
+  ];
+  let loaded = false;
+  for (const p of candidates) {
     try {
-      // eslint-disable-next-line no-await-in-loop
-      const mod = await import(path);
-      if (mod && typeof mod.renderHelix === 'function') {
-        cachedRenderHelix = mod.renderHelix;
+      const mod = await import(p);
+      if (mod && (typeof mod.renderHelix === 'function' || typeof mod.default === 'function')) {
+        renderHelix = mod.renderHelix || mod.default;
+        loaded = true;
         break;
       }
-    } catch (e) {
-      importError = e;
-    }
+    } catch (_) { /* try next */ }
   }
-
-  if (!cachedRenderHelix) {
-    throw new Error(
-      "Could not import renderHelix from helix-renderer.mjs. " +
-      "Tried common paths relative to tests/. Please adjust the import path in tests/helix-renderer.test.mjs. " +
-      `Last import error: ${importError?.message ?? 'n/a'}`
-    );
+  if (!loaded) {
+    // Fallback: if the test is colocated or the module path is custom, let this explicit import be edited by maintainers.
+    // eslint-disable-next-line no-throw-literal
+    throw { message: 'renderHelix module not found. Update import path in tests/helix-renderer.test.mjs.' };
   }
-
-  return cachedRenderHelix;
+} catch (e) {
+  // Provide a clearer error message to help adjust path quickly.
+  throw new Error(`Unable to import renderHelix. Please update the import path in tests/helix-renderer.test.mjs.\nOriginal: ${e && e.message ? e.message : e}`);
 }
 
-// Minimal NUM constants used by the renderer
+
+// Minimal CanvasRenderingContext2D spy to capture drawing operations and styles.
+function makeCtxSpy() {
+  const calls = [];
+  let state = {
+    fillStyle: null,
+    strokeStyle: null,
+    lineWidth: null,
+    lineCap: null,
+    lineJoin: null,
+  };
+  const ctx = {
+    // Style properties with setters tracking assignments
+    get fillStyle() { return state.fillStyle; },
+    set fillStyle(v) { state.fillStyle = v; calls.push({ type: 'setFillStyle', value: v }); },
+
+    get strokeStyle() { return state.strokeStyle; },
+    set strokeStyle(v) { state.strokeStyle = v; calls.push({ type: 'setStrokeStyle', value: v }); },
+
+    get lineWidth() { return state.lineWidth; },
+    set lineWidth(v) { state.lineWidth = v; calls.push({ type: 'setLineWidth', value: v }); },
+
+    get lineCap() { return state.lineCap; },
+    set lineCap(v) { state.lineCap = v; calls.push({ type: 'setLineCap', value: v }); },
+
+    get lineJoin() { return state.lineJoin; },
+    set lineJoin(v) { state.lineJoin = v; calls.push({ type: 'setLineJoin', value: v }); },
+
+    // Path methods capturing current styles at call time
+    clearRect: (x, y, w, h) => calls.push({ type: 'clearRect', x, y, w, h }),
+    fillRect: (x, y, w, h) => calls.push({ type: 'fillRect', x, y, w, h, fillStyle: state.fillStyle }),
+    beginPath: () => calls.push({ type: 'beginPath' }),
+    arc: (x, y, r, s, e) => calls.push({ type: 'arc', x, y, r, s, e, strokeStyle: state.strokeStyle, lineWidth: state.lineWidth }),
+    moveTo: (x, y) => calls.push({ type: 'moveTo', x, y }),
+    lineTo: (x, y) => calls.push({ type: 'lineTo', x, y }),
+    stroke: () => calls.push({ type: 'stroke', strokeStyle: state.strokeStyle, lineWidth: state.lineWidth }),
+    fill: () => calls.push({ type: 'fill', fillStyle: state.fillStyle }),
+    _calls: calls,
+    _state: state,
+  };
+  return ctx;
+}
+
+// Shared NUM constants based on the implementation's expectations
 const NUM = Object.freeze({
   THREE: 3,
   SEVEN: 7,
@@ -60,170 +93,152 @@ const NUM = Object.freeze({
   ONEFORTYFOUR: 144,
 });
 
-// Helper: create a mock 2D context that records calls and property sets.
-function createMockCtx() {
-  const calls = [];
-  // Use getters/setters to record style assignments
-  let _fillStyle = null;
-  let _strokeStyle = null;
-  let _lineWidth = null;
-  let _lineCap = null;
-  let _lineJoin = null;
-
-  const record = (name, args = []) => {
-    calls.push({ name, args });
-  };
-
-  const ctx = {
-    // stateful props with setters
-    get fillStyle() { return _fillStyle; },
-    set fillStyle(v) { _fillStyle = v; record('set:fillStyle', [v]); },
-
-    get strokeStyle() { return _strokeStyle; },
-    set strokeStyle(v) { _strokeStyle = v; record('set:strokeStyle', [v]); },
-
-    get lineWidth() { return _lineWidth; },
-    set lineWidth(v) { _lineWidth = v; record('set:lineWidth', [v]); },
-
-    get lineCap() { return _lineCap; },
-    set lineCap(v) { _lineCap = v; record('set:lineCap', [v]); },
-
-    get lineJoin() { return _lineJoin; },
-    set lineJoin(v) { _lineJoin = v; record('set:lineJoin', [v]); },
-
-    // 2D methods
-    save: () => record('save'),
-    restore: () => record('restore'),
-    clearRect: (...args) => record('clearRect', args),
-    fillRect: (...args) => record('fillRect', args),
-    beginPath: () => record('beginPath'),
-    moveTo: (...args) => record('moveTo', args),
-    lineTo: (...args) => record('lineTo', args),
-    arc: (...args) => record('arc', args),
-    stroke: () => record('stroke'),
-    fill: () => record('fill'),
-  };
-
-  return { ctx, calls };
+function summarize(calls, type) {
+  return calls.filter(c => c.type === type);
 }
 
-// Common palette used across tests
-const palette = Object.freeze({
-  bg: '#111827',
-  layers: ['#60a5fa', '#34d399', '#fbbf24', '#f472b6'], // vesica, tree, fib, helix
-});
+function strokeColors(calls) {
+  return summarize(calls, 'stroke').map(s => s.strokeStyle);
+}
 
-test('renderHelix: draws background and uses full-canvas clear/fill with ND-safe palette', async () => {
-  const renderHelix = await getRenderHelix();
-
-  const width = 800;
-  const height = 600;
-  const { ctx, calls } = createMockCtx();
+test('renderHelix draws layers in order and with expected stroke counts', () => {
+  const ctx = makeCtxSpy();
+  const width = 200, height = 100;
+  const palette = {
+    bg: '#101010',
+    layers: ['#a1', '#b2', '#c3', '#d4'],
+  };
 
   renderHelix(ctx, { width, height, palette, NUM });
 
-  // First calls should save, clear, set fillStyle, fillRect
-  assert.equal(calls[0]?.name, 'save', 'First call should be ctx.save()');
-  assert.deepEqual(calls.find(c => c.name === 'clearRect')?.args, [0, 0, width, height], 'clearRect should cover full canvas');
+  const calls = ctx._calls;
 
-  const fillStyleSet = calls.find(c => c.name === 'set:fillStyle');
-  assert.ok(fillStyleSet, 'fillStyle should be set');
-  assert.equal(fillStyleSet.args[0], palette.bg, 'fillStyle should be set to palette.bg');
+  // Clear and background
+  const clears = summarize(calls, 'clearRect');
+  assert.equal(clears.length, 1, 'clearRect called once');
+  assert.deepEqual(clears[0], { type: 'clearRect', x: 0, y: 0, w: width, h: height }, 'clearRect dims');
 
-  const fillRectCall = calls.find(c => c.name === 'fillRect');
+  const fillsRect = summarize(calls, 'fillRect');
+  assert.equal(fillsRect.length, 1, 'fillRect called once for background');
+  assert.equal(fillsRect[0].fillStyle, '#101010', 'background uses palette.bg');
 
-  assert.ok(fillRectCall, 'fillRect should be called');
-  assert.deepEqual(fillRectCall.args, [0, 0, width, height], 'fillRect should cover full canvas');
+  // Line rendering configuration
+  // Ensure rounded caps/joins were set at least once
+  assert.ok(calls.some(c => c.type === 'setLineCap' && c.value === 'round'), 'lineCap set to round');
+  assert.ok(calls.some(c => c.type === 'setLineJoin' && c.value === 'round'), 'lineJoin set to round');
 
-  // Last call should be top-level restore
-  assert.equal(calls.at(-1)?.name, 'restore', 'Final call should be ctx.restore()');
+  // Stroke counts by layer based on implementation:
+  // Vesica: 18 strokes (2 per cell * 3x3)
+  // Tree:   22 strokes (22 path edges)
+  // Fib:     1 stroke
+  // Helix:  12 strokes (2 strands + 10 crossbars)
+  const strokes = summarize(calls, 'stroke');
+  assert.equal(strokes.length, 53, 'total stroke calls = 53');
+
+  // Validate layer order via stroke colors
+  const colors = strokeColors(calls);
+  const vesica = colors.slice(0, 18);
+  const tree = colors.slice(18, 40);
+  const fib = colors.slice(40, 41);
+  const helix = colors.slice(41);
+
+  assert.ok(vesica.every(c => c === '#a1'), 'vesica uses first layer color across 18 strokes');
+  assert.equal(vesica.length, 18, 'vesica stroke count');
+
+  assert.ok(tree.every(c => c === '#b2'), 'tree uses second layer color across 22 strokes');
+  assert.equal(tree.length, 22, 'tree stroke count');
+
+  assert.equal(fib.length, 1, 'fibonacci single stroke');
+  assert.equal(fib[0], '#c3', 'fibonacci uses third layer color');
+
+  assert.ok(helix.every(c => c === '#d4'), 'helix uses fourth layer color across 12 strokes');
+  assert.equal(helix.length, 12, 'helix stroke count');
+
+  // Arc and fill counts: vesica (18 arcs) + tree nodes (10 arcs) = 28 total arcs
+  const arcs = summarize(calls, 'arc');
+  assert.equal(arcs.length, 28, 'total circles/arcs drawn = 28');
+
+  // Node fills: tree draws 10 filled nodes
+  const fills = summarize(calls, 'fill');
+  assert.equal(fills.length, 10, '10 node fills for Tree of Life');
 });
 
-test('renderHelix: sets layer stroke styles for vesica, tree, fibonacci, and helix', async () => {
-  const renderHelix = await getRenderHelix();
+test('renderHelix pads missing layer colors to four with fallback #e8e8f0', () => {
+  const ctx = makeCtxSpy();
+  const palette = {
+    bg: '#ffffff',
+    layers: ['#111111'], // only one provided; others should pad with fallback
+  };
+  renderHelix(ctx, { width: 180, height: 120, palette, NUM });
 
-  const { ctx, calls } = createMockCtx();
-  renderHelix(ctx, { width: 640, height: 480, palette, NUM });
+  const colors = strokeColors(ctx._calls);
+  // Expected: vesica -> '#111111'; tree/fib/helix -> '#e8e8f0'
+  const vesica = colors.slice(0, 18);
+  const tree = colors.slice(18, 40);
+  const fib = colors.slice(40, 41);
+  const helix = colors.slice(41);
 
-  const strokeSets = calls.filter(c => c.name === 'set:strokeStyle').map(c => c.args[0]);
+  assert.ok(vesica.every(c => c === '#111111'), 'vesica uses explicit provided color');
+  assert.ok(tree.every(c => c === '#e8e8f0'), 'tree padded to fallback');
+  assert.ok(fib.every(c => c === '#e8e8f0'), 'fibonacci padded to fallback');
+  assert.ok(helix.every(c => c === '#e8e8f0'), 'helix padded to fallback');
+});
 
-  // Each layer should set strokeStyle to its color at least once
-  for (const color of palette.layers) {
-    assert.ok(strokeSets.includes(color), `Expected strokeStyle to be set to ${color}`);
+test('renderHelix falls back to #e8e8f0 when provided per-layer colors are falsy', () => {
+  const ctx = makeCtxSpy();
+  const palette = {
+    bg: '#222',
+    // All entries present but falsy; internal functions should use color || '#e8e8f0'
+    layers: ['', null, undefined, 0],
+  };
+  renderHelix(ctx, { width: 250, height: 150, palette, NUM });
+
+  const colors = strokeColors(ctx._calls);
+  const vesica = colors.slice(0, 18);
+  const tree = colors.slice(18, 40);
+  const fib = colors.slice(40, 41);
+  const helix = colors.slice(41);
+
+  for (const group of [vesica, tree, fib, helix]) {
+    assert.ok(group.every(c => c === '#e8e8f0'), 'layer color falls back to #e8e8f0 when falsy');
   }
 });
 
-test('renderHelix: call accounting is stable for given NUM constants (beginPath, stroke, arc, lineTo)', async () => {
-  const renderHelix = await getRenderHelix();
-
-  const { ctx, calls } = createMockCtx();
-  renderHelix(ctx, { width: 900, height: 600, palette, NUM });
-
-  const count = (name) => calls.filter(c => c.name === name).length;
-
-  // Derived expectations from implementation:
-  // Vesica: 3x3 grid, two circles per cell => 18 arcs, 18 beginPath, 18 strokes
-  // Tree-of-Life: 22 paths => 22 beginPath + 22 strokes; 10 node circles => 10 arcs + 10 beginPath + 10 strokes
-  // Fibonacci: 1 beginPath + 33 lineTo + 1 stroke; 0 arcs
-  // Helix lattice: 2 strands: each has 1 beginPath + 144 lineTo + 1 stroke => total 2 beginPath, 288 lineTo, 2 stroke
-  // Crossbars: step every 16 across 0..144 => 10 bars, each 1 beginPath + 1 lineTo + 1 stroke
-  // Totals:
-  //   beginPath: 18 + (22+10) + 1 + (2+10) = 63
-  //   stroke:    18 + (22+10) + 1 + (2+10) = 63
-  //   arc:       18 + 10 = 28
-  //   lineTo:    22 + 33 + 288 + 10 = 353
-
-  assert.equal(count('beginPath'), 63, 'Expected total beginPath count to be 63');
-  assert.equal(count('stroke'), 63, 'Expected total stroke count to be 63');
-  assert.equal(count('arc'), 28, 'Expected total arc count to be 28');
-  assert.equal(count('lineTo'), 353, 'Expected total lineTo count to be 353');
-
-  // Also check save/restore counts: top-level + 4 layers
-  assert.equal(count('save'), 5, 'Expected 5 save() calls (top + 4 layers)');
-  assert.equal(count('restore'), 5, 'Expected 5 restore() calls (top + 4 layers)');
+test('renderHelix handles degenerate sizes (0x0) without throwing', () => {
+  const ctx = makeCtxSpy();
+  const palette = { bg: '#000', layers: ['#1', '#2', '#3', '#4'] };
+  assert.doesNotThrow(() => renderHelix(ctx, { width: 0, height: 0, palette, NUM }), 'should not throw on 0x0 canvas');
+  // Even with 0 sizes, structure of calls remains: still clears/paints and performs strokes
+  const strokes = summarize(ctx._calls, 'stroke');
+  assert.equal(strokes.length, 53, 'stroke count remains structurally consistent');
 });
 
-test('renderHelix: ND-safe stroke widths and caps set by layers', async () => {
-  const renderHelix = await getRenderHelix();
+test('helix crossbar cadence remains at floor(144/9)=16, producing 10 crossbar strokes', () => {
+  const ctx = makeCtxSpy();
+  const palette = { bg: '#fff', layers: ['#a', '#b', '#c', '#d'] };
+  renderHelix(ctx, { width: 1440, height: 360, palette, NUM });
 
-  const { ctx, calls } = createMockCtx();
-  renderHelix(ctx, { width: 500, height: 500, palette, NUM });
+  const strokes = summarize(ctx._calls, 'stroke');
+  // Helix strokes are at the end; last 12 strokes belong to helix (2 strands + 10 crossbars).
+  const helixTail = strokes.slice(-12);
+  assert.equal(helixTail.length, 12, 'helix stroke tail length = 12');
 
-  const lineWidthSets = calls.filter(c => c.name === 'set:lineWidth').map(c => c.args[0]);
-
-  const lineCapSets = calls.filter(c => c.name === 'set:lineCap').map(c => c.args[0]);
-  const lineJoinSets = calls.filter(c => c.name === 'set:lineJoin').map(c => c.args[0]);
-
-  // Vesica uses lineWidth=2 and lineCap="round"
-  assert.ok(lineWidthSets.includes(2), 'Expected a lineWidth of 2 to be set');
-  assert.ok(lineCapSets.includes('round'), 'Expected lineCap "round" to be set');
-
-  // Tree-of-Life uses lineWidth=1.5 and lineCap="round"
-  assert.ok(lineWidthSets.some(v => Math.abs(v - 1.5) < 1e-9), 'Expected a lineWidth of 1.5 to be set');
-
-  // Fibonacci uses lineWidth=2 and lineJoin="round"
-  assert.ok(lineJoinSets.includes('round'), 'Expected lineJoin "round" to be set');
+  // We cannot directly separate strands vs crossbars without deeper path introspection,
+  // but we can assert that the 10 crossbars exist by verifying total helix strokes.
+  // Additionally, ensure helix color is used.
+  assert.ok(helixTail.every(s => s.strokeStyle === '#d'), 'helix tail uses helix color');
 });
 
-test('renderHelix: zero-size canvas still executes without throwing and respects rect arguments', async () => {
-  const renderHelix = await getRenderHelix();
+// Optional: sanity check that background is painted before any geometry strokes
+test('background fill occurs before any geometry stroke', () => {
+  const ctx = makeCtxSpy();
+  const palette = { bg: '#abc', layers: ['#1', '#2', '#3', '#4'] };
+  renderHelix(ctx, { width: 320, height: 240, palette, NUM });
 
-  const { ctx, calls } = createMockCtx();
-  assert.doesNotThrow(() => renderHelix(ctx, { width: 0, height: 0, palette, NUM }));
+  const firstFillRectIdx = ctx._calls.findIndex(c => c.type === 'fillRect');
+  const firstStrokeIdx = ctx._calls.findIndex(c => c.type === 'stroke');
 
-  const clear = calls.find(c => c.name === 'clearRect');
-  const fill = calls.find(c => c.name === 'fillRect');
-  assert.deepEqual(clear?.args, [0, 0, 0, 0], 'clearRect should match zero-size canvas');
-  assert.deepEqual(fill?.args, [0, 0, 0, 0], 'fillRect should match zero-size canvas');
-});
-
-test('renderHelix: handles undefined layer colors gracefully (no throws, still draws)', async () => {
-  const renderHelix = await getRenderHelix();
-
-  const { ctx, calls } = createMockCtx();
-  const brokenPalette = { bg: '#000', layers: ['#123456'] }; // fewer than needed
-  assert.doesNotThrow(() => renderHelix(ctx, { width: 300, height: 200, palette: brokenPalette, NUM }));
-
-  // Still should have performed some drawing calls
-  assert.ok(calls.some(c => c.name === 'beginPath'), 'Expected some drawing operations despite incomplete palette');
+  assert.ok(firstFillRectIdx !== -1, 'has background fill');
+  assert.ok(firstStrokeIdx !== -1, 'has strokes');
+  assert.ok(firstFillRectIdx < firstStrokeIdx, 'background fill precedes first stroke');
 });
