@@ -1,19 +1,18 @@
 // Per Texturas Numerorum, Spira Loquitur.  //
-/*
-  helix-renderer.mjs
-  ND-safe static renderer for layered sacred geometry.
-
-  Layers (drawn in order):
-    1) Vesica field
-    2) Tree-of-Life scaffold
-    3) Fibonacci curve
-    4) Double-helix lattice (two phase-shifted strands with calm crossbars)
-
-  Rationale:
-    - No motion or autoplay; everything renders once.
-    - Soft contrast palette keeps focus gentle.
-    - Pure functions highlight numerology constants.
-*/
+/**
+ * Render the complete static helix composition onto a 2D canvas context.
+ *
+ * Renders four stacked layers (in order): a vesica field, Tree-of-Life scaffold,
+ * a Fibonacci-inspired curve, and a double-helix lattice. The function clears
+ * the canvas and fills the background from the provided palette, then draws
+ * each layer once using the numerology constants in `NUM`.
+ *
+ * @param {Object} opts - Rendering options.
+ * @param {number} opts.width - Canvas width in pixels.
+ * @param {number} opts.height - Canvas height in pixels.
+ * @param {Object} opts.palette - Color configuration. Must include `bg` and `layers` (array of 4 layer colors).
+ * @param {Object} opts.NUM - Numerology constants used by the layer renderers.
+ */
 
 export function renderHelix(ctx, opts) {
   const { width, height, palette, NUM } = opts;
@@ -29,7 +28,19 @@ export function renderHelix(ctx, opts) {
   drawHelixLattice(ctx, width, height, palette.layers[3], NUM);
 }
 
-// Layer 1: Vesica field using a 3x3 grid
+/**
+ * Draws a 3×3 Vesica field: pairs of adjacent circles (vesicas) in each grid cell.
+ *
+ * Each grid cell is centered within the canvas; two circles are drawn per cell with
+ * their centers offset horizontally by half the circle radius. Radius is computed
+ * as min(width, height) / NUM.NINE to keep proportions ND-safe and gentle.
+ *
+ * @param {CanvasRenderingContext2D} ctx - 2D canvas rendering context to draw on.
+ * @param {number} w - Canvas width in pixels.
+ * @param {number} h - Canvas height in pixels.
+ * @param {string} color - Stroke color used for the vesica outlines.
+ * @param {Object} NUM - Numeric constants object (expects at least NUM.THREE and NUM.NINE).
+ */
 function drawVesica(ctx, w, h, color, NUM) {
   const cols = NUM.THREE;
   const rows = NUM.THREE;
@@ -50,7 +61,19 @@ function drawVesica(ctx, w, h, color, NUM) {
   }
 }
 
-// Layer 2: Tree-of-Life scaffold with 10 nodes and 22 paths
+/**
+ * Render a static Tree-of-Life scaffold: 10 spatially fixed nodes connected by 22 straight paths.
+ *
+ * Draws a fixed arrangement of 10 node positions (relative to the canvas width/height), strokes 22 connecting
+ * edges using the provided color, then fills circular nodes at each position with a small radius.
+ *
+ * The function mutates the supplied 2D canvas context (no return value). Node positions are hard-coded as
+ * proportional coordinates; edge order is stroked before nodes are filled so nodes appear on top.
+ *
+ * @param {Object} NUM - Numerology constants object. Expected to provide at least:
+ *                       - NUM.NINE: radius (in pixels) used for each node.
+ *                       (The paths array contains 22 links corresponding to NUM.TWENTYTWO conceptually.)
+ */
 function drawTreeOfLife(ctx, w, h, color, NUM) {
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
@@ -92,7 +115,18 @@ function drawTreeOfLife(ctx, w, h, color, NUM) {
   }
 }
 
-// Layer 3: Fibonacci curve using 33 segments
+/**
+ * Draws a continuous Fibonacci-like spiral curve (33 segments) and strokes it.
+ *
+ * The path is generated from the golden ratio (phi) with radius growing as
+ * phi^(i/NUM.NINE) and angle theta = i*(PI/NUM.SEVEN), for i = 0..NUM.THIRTYTHREE.
+ * The curve is centered at (0.75*w, 0.3*h), scaled by Math.min(w, h) / NUM.NINETYNINE,
+ * and stroked with lineWidth 2 using the provided color.
+ *
+ * @param {string} color - Stroke color for the curve.
+ * @param {object} NUM - Numerology constants object. Must include:
+ *                       NUM.NINE, NUM.SEVEN, NUM.THIRTYTHREE, and NUM.NINETYNINE.
+ */
 function drawFibonacciCurve(ctx, w, h, color, NUM) {
   const phi = (1 + Math.sqrt(5)) / 2;
   const center = { x: w * 0.75, y: h * 0.3 };
@@ -110,7 +144,22 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
   ctx.stroke();
 }
 
-// Layer 4: Static double-helix lattice
+/**
+ * Render a static double-helix lattice across the canvas.
+ *
+ * Draws two phase-shifted sinusoidal strands spanning the canvas width and vertical crossbars
+ * connecting them, producing a calm double-helix lattice. Geometry and spacing are driven by the
+ * provided NUM constants.
+ *
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D rendering context to draw into.
+ * @param {number} w - Canvas width in pixels (used to span the strands horizontally).
+ * @param {number} h - Canvas height in pixels (used to compute vertical midline and amplitude).
+ * @param {string} color - Stroke color for strands and crossbars.
+ * @param {Object} NUM - Numeric constants object; must include:
+ *   - ONEFORTYFOUR: number of vertical steps,
+ *   - NINE: divisor used for amplitude and crossbar spacing,
+ *   - ELEVEN: divisor used in the sine argument for strand winding.
+ */
 function drawHelixLattice(ctx, w, h, color, NUM) {
   const steps = NUM.ONEFORTYFOUR; // 144 vertical steps
   const amp = h / NUM.NINE;
