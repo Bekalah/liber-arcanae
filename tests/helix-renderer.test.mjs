@@ -18,23 +18,38 @@ try {
     '../helix-renderer.js',
   ];
   let loaded = false;
+
   for (const p of candidates) {
+
     try {
+
       const mod = await import(p);
+
       if (mod && (typeof mod.renderHelix === 'function' || typeof mod.default === 'function')) {
+
         renderHelix = mod.renderHelix || mod.default;
         loaded = true;
         break;
+
       }
+
     } catch (_) { /* try next */ }
   }
+
   if (!loaded) {
+
     // Fallback: if the test is colocated or the module path is custom, let this explicit import be edited by maintainers.
+
     // eslint-disable-next-line no-throw-literal
+
     throw { message: 'renderHelix module not found. Update import path in tests/helix-renderer.test.mjs.' };
+
   }
+
 } catch (e) {
+
   // Provide a clearer error message to help adjust path quickly.
+
   throw new Error(`Unable to import renderHelix. Please update the import path in tests/helix-renderer.test.mjs.\nOriginal: ${e && e.message ? e.message : e}`);
 }
 
@@ -194,6 +209,7 @@ test('renderHelix falls back to #e8e8f0 when provided per-layer colors are falsy
   renderHelix(ctx, { width: 250, height: 150, palette, NUM });
 
   const colors = strokeColors(ctx._calls);
+
   const vesica = colors.slice(0, 18);
   const tree = colors.slice(18, 40);
   const fib = colors.slice(40, 41);
@@ -218,7 +234,7 @@ test('helix crossbar cadence remains at floor(144/9)=16, producing 10 crossbar s
   const palette = { bg: '#fff', layers: ['#a', '#b', '#c', '#d'] };
   renderHelix(ctx, { width: 1440, height: 360, palette, NUM });
 
-  const strokes = summarize(ctx._calls, 'stroke');
+  const strokes = summarize(calls = ctx._calls, 'stroke'); // ensure `calls` available if needed
   // Helix strokes are at the end; last 12 strokes belong to helix (2 strands + 10 crossbars).
   const helixTail = strokes.slice(-12);
   assert.equal(helixTail.length, 12, 'helix stroke tail length = 12');
