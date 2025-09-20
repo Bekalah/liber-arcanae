@@ -1,19 +1,17 @@
 // Per Texturas Numerorum, Spira Loquitur.
-/*
-  helix-renderer.mjs
-  ND-safe static renderer for layered sacred geometry.
-
-  Layers (drawn in order):
-    1) Vesica field
-    2) Tree-of-Life scaffold
-    3) Fibonacci curve
-    4) Double-helix lattice (two phase-shifted strands with calm crossbars)
-
-  Rationale:
-    - No motion or autoplay; everything renders once.
-    - Soft contrast palette keeps focus gentle.
-    - Pure functions highlight numerology constants.
-*/
+/**
+ * Render a static, four-layer sacred-geometry composition onto a canvas.
+ *
+ * Clears the canvas, paints the background, configures rounded stroke rendering, ensures four layer colors
+ * (pads palette.layers with a neutral fallback if needed), and draws the layers in depth order:
+ * vesica field, tree-of-life scaffold, Fibonacci curve, and double-helix lattice.
+ *
+ * @param {Object} opts - Rendering options.
+ * @param {number} opts.width - Canvas width in pixels.
+ * @param {number} opts.height - Canvas height in pixels.
+ * @param {Object} opts.palette - Color palette; must include `bg` and `layers` (an array of layer colors).
+ * @param {Object} opts.NUM - Numerology constants used by the internal draw routines.
+ */
 
 export function renderHelix(ctx, opts) {
   const { width, height, palette, NUM } = opts;
@@ -37,7 +35,17 @@ export function renderHelix(ctx, opts) {
   drawHelixLattice(ctx, width, height, helixColor, NUM);
 }
 
-// Layer 1: Vesica field using a 3x3 grid
+/**
+ * Draws a 3x3 vesica field: paired overlapping circles in each grid cell.
+ *
+ * Draws two small, horizontally offset stroked circles at the center of each
+ * cell in a 3×3 grid across the given width/height. Uses a gentle radius
+ * derived from the minimum dimension and NUM.NINE to keep spacing visually
+ * balanced. If `color` is falsy, the function falls back to "#e8e8f0".
+ *
+ * @param {string} color - Stroke color for the circles; fallback "#e8e8f0" used when falsy.
+ * @param {object} NUM - Numeric constants provider; function reads NUM.THREE and NUM.NINE.
+ */
 function drawVesica(ctx, w, h, color, NUM) {
   const strokeColor = color || "#e8e8f0"; // fallback keeps geometry legible if palette trims
   const cols = NUM.THREE;
@@ -115,7 +123,15 @@ function drawTreeOfLife(ctx, w, h, color, NUM) {
   }
 }
 
-// Layer 3: Fibonacci curve using 33 segments
+/**
+ * Draws a static Fibonacci (golden-ratio) spiral onto the provided canvas context.
+ *
+ * Renders a stroked spiral centered at ~(75% width, 30% height) using 33 segments. The drawing
+ * uses the golden ratio to exponentially increase radius with each segment.
+ *
+ * @param {string} [color] - Stroke color for the curve. Defaults to "#e8e8f0" when falsy.
+ * @param {object} NUM - Numeric constants object. Required keys: THIRTYTHREE, SEVEN, NINE, NINETYNINE.
+ */
 function drawFibonacciCurve(ctx, w, h, color, NUM) {
   const curveColor = color || "#e8e8f0"; // ensures spiral stays visible even with short palettes
   const phi = (1 + Math.sqrt(5)) / 2;
@@ -135,18 +151,20 @@ function drawFibonacciCurve(ctx, w, h, color, NUM) {
 }
 
 /**
- * Draws a static double-helix lattice: two phase-shifted sinusoidal strands with regular vertical crossbars.
+ * Render a static double-helix lattice: two phase-shifted sinusoidal strands with vertical crossbars.
  *
- * Renders two helical strands across the canvas width and connects them with evenly spaced
- * vertical bars to form a lattice. Geometry is parameterized so the pattern scales with
- * the canvas and the provided numeric configuration.
+ * Draws two helical strands across the canvas width and connects them with evenly spaced vertical bars.
+ * Scales to the provided canvas size and uses numeric constants from `NUM` to control resolution,
+ * amplitude, phase, and crossbar spacing. Mutates the supplied CanvasRenderingContext2D (stroke-only).
  *
  * @param {number} w - Canvas width in pixels.
  * @param {number} h - Canvas height in pixels.
- * @param {string} color - Stroke color used for strands and crossbars.
- * @param {object} NUM - Numeric configuration object. Expected properties used here:
- *                      ONEFORTYFOUR (step count), TWENTYTWO (amplitude divisor),
- *                      ELEVEN (phase / sine divisor), and NINE (crossbar spacing divisor).
+ * @param {string} color - Stroke color for strands and crossbars; falls back to "#e8e8f0" if falsy.
+ * @param {object} NUM - Numeric config with required properties:
+ *                       ONEFORTYFOUR (total vertical steps),
+ *                       TWENTYTWO (amplitude divisor),
+ *                       ELEVEN (sine divisor for phase),
+ *                       NINE (divisor used to compute crossbar spacing).
  */
 function drawHelixLattice(ctx, w, h, color, NUM) {
   const steps = NUM.ONEFORTYFOUR; // 144 vertical steps
