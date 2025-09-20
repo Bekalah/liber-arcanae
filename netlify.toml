@@ -1,6 +1,0 @@
-[build]
-  command = ""
-  publish = "/"
-
-[build.environment]
-  GIT_LFS_ENABLED = "false"
