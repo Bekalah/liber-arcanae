@@ -1,18 +1,18 @@
-/*
-  helix-renderer.mjs
-  ND-safe static renderer for layered sacred geometry.
-
-  Layers:
-    1) Vesica field (intersecting circles)
-    2) Tree-of-Life scaffold (10 sephirot + 22 paths; simplified layout)
-    3) Fibonacci curve (log spiral polyline; static)
-    4) Double-helix lattice (two phase-shifted strands with crossbars)
-
-  Design notes:
-    - Calm color palette is supplied externally so accessibility can be tuned without changing code.
-    - No animation, timers, or motion to remain ND-safe and meditative.
-    - Pure functions consume a drawing context and settings; easy to reuse offline.
-*/
+/**
+ * Render a static, non-animated layered sacred-geometry composition onto a canvas.
+ *
+ * Orchestrates the full render pipeline: validates inputs, builds normalized
+ * settings from `config`, saves the canvas state, and draws the background,
+ * vesica-field, Tree-of-Life scaffold, Fibonacci spiral, and double-helix
+ * lattice in that order. If `settings.notice` is present, it is drawn last.
+ * Restores the canvas state before returning.
+ *
+ * Note: The function performs an early return if `ctx` or `config` are falsy.
+ *
+ * @param {CanvasRenderingContext2D} ctx - 2D canvas rendering context to draw into.
+ * @param {Object} config - Rendering configuration (see `createSettings` for expected keys:
+ *                          width, height, palette, NUM constants, and optional `notice`).
+ */
 
 export function renderHelix(ctx, config) {
   if (!ctx || !config) {
@@ -34,6 +34,20 @@ export function renderHelix(ctx, config) {
   ctx.restore();
 }
 
+/**
+ * Normalize and fill default rendering configuration used by the renderer.
+ *
+ * Coerces width and height to Numbers (falling back to 1440x900), supplies a default
+ * color palette and numeric constants set when not provided, and ensures a notice string.
+ *
+ * @param {Object} config - Partial configuration object; properties may be missing.
+ * @param {number} [config.width] - Desired canvas width (coerced with Number()).
+ * @param {number} [config.height] - Desired canvas height (coerced with Number()).
+ * @param {Object} [config.palette] - Palette object with `bg`, `ink`, and `layers` array; a sensible default is used if omitted.
+ * @param {Object} [config.NUM] - Named numeric constants (e.g., THREE, SEVEN, NINE, etc.); a default set is used if omitted.
+ * @param {string} [config.notice] - Optional notice text to render; defaults to an empty string.
+ * @return {{width: number, height: number, palette: {bg: string, ink: string, layers: string[]}, NUM: Object, notice: string}} Normalized settings object ready for rendering.
+ */
 function createSettings(config) {
   const width = Number(config.width) || 1440;
   const height = Number(config.height) || 900;
@@ -61,6 +75,18 @@ function createSettings(config) {
   };
 }
 
+/**
+ * Paints the canvas background and overlays a subtle, deterministic radial gradient.
+ *
+ * The function fills the full bounds with `settings.palette.bg` and then draws a
+ * non-animated radial gradient (centered relative to the bounds) that fades from
+ * `settings.palette.layers[0]` at low opacity to transparent. Designed to be
+ * ND-safe and produce a stable backdrop for subsequent layered drawing operations.
+ *
+ * Expects `bounds` to provide numeric `width` and `height`, and `settings` to
+ * include a `palette` with `bg` and `layers[0]`, plus numeric `NUM` constants
+ * referenced by the renderer.
+ */
 function drawBackground(ctx, bounds, settings) {
   // ND-safe: background set first so all layers rest on stable field.
   ctx.fillStyle = settings.palette.bg;
@@ -82,6 +108,16 @@ function drawBackground(ctx, bounds, settings) {
   ctx.fillRect(0, 0, bounds.width, bounds.height);
 }
 
+/**
+ * Draws a grid of overlapping circles (a vesica-style field) across the provided bounds.
+ *
+ * Renders `rows x columns` circles using radii and spacing derived from `settings.NUM`
+ * and fills stroke color from `settings.palette.layers[1]` with a computed alpha.
+ * The function is deterministic and performs all painting on the supplied canvas context.
+ *
+ * @param {{width:number,height:number}} bounds - Drawing bounds used to compute circle radius and grid spacing.
+ * @param {{NUM:Object,palette:{layers:string[]}}} settings - Normalized renderer settings; uses `NUM` numeric constants and `palette.layers[1]` for stroke color.
+ */
 function drawVesicaField(ctx, bounds, settings) {
   const { NUM, palette } = settings;
   const base = Math.min(bounds.width, bounds.height);
@@ -111,6 +147,14 @@ function drawVesicaField(ctx, bounds, settings) {
   ctx.restore();
 }
 
+/**
+ * Render a simplified Tree of Life scaffold (10 sephirot and 22 connecting paths).
+ *
+ * Draws ten circular nodes and their connecting paths inside the given bounds using colors and numeric constants from settings. Nodes are filled with a layer color and stroked with a subtle ink outline; connecting paths are drawn with a translucent layer color. The function mutates the provided canvas context but saves and restores its state.
+ *
+ * @param {{width: number, height: number}} bounds - Area used to compute node positions, spacing, and radii.
+ * @param {Object} settings - Rendering settings containing `palette` (colors) and `NUM` (numeric constants) used for sizes, spacing, and alpha calculations.
+ */
 function drawTreeOfLife(ctx, bounds, settings) {
   const { palette, NUM } = settings;
   const centerX = bounds.width / (settings.NUM.NINE - settings.NUM.SEVEN);
@@ -150,6 +194,20 @@ function drawTreeOfLife(ctx, bounds, settings) {
   ctx.restore();
 }
 
+/**
+ * Produce the 10 sephirot node positions for a Kircher-style Tree of Life layout.
+ *
+ * Returns an array of node objects (name, x, y, radius) positioned around a central
+ * column: one top node, symmetric left/right pairs on subsequent rows, and a
+ * descending central column culminating in Malkuth.
+ *
+ * @param {number} centerX - X coordinate of the central column.
+ * @param {number} marginY - Y coordinate of the top node (Keter).
+ * @param {number} verticalGap - Vertical spacing between successive rows of nodes.
+ * @param {number} horizontalGap - Horizontal offset from center for left/right nodes.
+ * @param {number} radius - Radius assigned to every node.
+ * @return {Array<{name: string, x: number, y: number, radius: number}>} Ten node objects in canonical order.
+ */
 function createTreeNodes(centerX, marginY, verticalGap, horizontalGap, radius) {
   // 10 sephirot positions in Kircher arrangement.
   const leftX = centerX - horizontalGap;
@@ -168,6 +226,13 @@ function createTreeNodes(centerX, marginY, verticalGap, horizontalGap, radius) {
   ];
 }
 
+/**
+ * Return the predefined list of 22 index pairs representing connections (paths) between Tree-of-Life nodes.
+ *
+ * Each pair [fromIndex, toIndex] refers to positions in the node array produced by `createTreeNodes()` (there are 10 nodes, indices 0–9).
+ *
+ * @return {number[][]} Array of 22 two-element arrays describing undirected/sequential connections between node indices.
+ */
 function createTreePaths() {
   // 22 connections reflecting Hebrew-letter paths in simplified order.
   return [
@@ -182,6 +247,19 @@ function createTreePaths() {
   ];
 }
 
+/**
+ * Draws a static Fibonacci (logarithmic) spiral as a stroked polyline onto the provided canvas context.
+ *
+ * The spiral is constructed using the golden ratio (phi) and a fixed number of segments derived from
+ * settings.NUM. Stroke color is taken from settings.palette.layers[3] with an alpha computed from NUM
+ * constants; line width is scaled to the smaller canvas dimension. This function saves and restores
+ * the canvas state and performs no animations or asynchronous work.
+ *
+ * @param {Object} bounds - Rendering bounds; must include numeric `width` and `height`.
+ * @param {Object} settings - Normalized renderer settings. Used properties:
+ *   - NUM: numeric constants (e.g., THREE, SEVEN, NINE, TWENTYTWO, NINETYNINE, ONEFORTYFOUR).
+ *   - palette: color palette where `palette.layers[3]` provides the base color for the spiral stroke.
+ */
 function drawFibonacciCurve(ctx, bounds, settings) {
   const { NUM, palette } = settings;
   const center = { x:bounds.width / NUM.THREE, y:bounds.height / NUM.SEVEN * NUM.THREE };
@@ -216,6 +294,19 @@ function drawFibonacciCurve(ctx, bounds, settings) {
   ctx.restore();
 }
 
+/**
+ * Render a static double-helix (two intertwined sine strands) with connecting rungs onto a canvas.
+ *
+ * Draws two phase-shifted sine strands down the provided bounds and renders horizontal rungs between them.
+ * Strand positions, amplitudes, colors, frequency, and rung density are derived from values in `settings.NUM`
+ * and `settings.palette`, producing a deterministic, non-animated decorative helix.
+ *
+ * Side effects:
+ * - Strokes directly to the supplied canvas 2D context.
+ *
+ * @param {Object} bounds - Layout bounds; must include numeric `width` and `height`.
+ * @param {Object} settings - Rendering settings object containing `NUM` (numeric constants) and `palette` (colors).
+ */
 function drawDoubleHelix(ctx, bounds, settings) {
   const { NUM, palette } = settings;
   const centerX = bounds.width * (NUM.TWENTYTWO / (NUM.THIRTYTHREE + NUM.ELEVEN));
@@ -263,6 +354,16 @@ function drawDoubleHelix(ctx, bounds, settings) {
   ctx.restore();
 }
 
+/**
+ * Stroke a polyline through an ordered list of points on the provided canvas context.
+ *
+ * If `points` is empty the function is a no-op. The path is begun, moved to the first
+ * point, then connected with straight segments to each subsequent point and stroked
+ * using the provided CSS color string.
+ *
+ * @param {Array<{x:number,y:number}>} points - Ordered array of point objects with numeric `x` and `y`.
+ * @param {string} color - CSS color string used for `ctx.strokeStyle`.
+ */
 function drawPolyline(ctx, points, color) {
     4) Double-helix lattice (two phase-shifted strands with rungs)
 
@@ -646,6 +747,17 @@ function strokePolyline(ctx, points) {
   ctx.stroke();
 }
 
+/**
+ * Draws a small informational notice in the lower-right corner of the canvas.
+ *
+ * The notice text is rendered using the ink color from the palette with an applied
+ * alpha and positioned inset from the bottom-right by a fraction derived from
+ * settings.NUM.ELEVEN. Applies a readable default font and right text alignment.
+ *
+ * @param {Object} bounds - Canvas bounds object; must provide numeric `width` and `height`.
+ * @param {Object} settings - Rendering settings; uses `settings.notice` (string),
+ *   `settings.palette.ink` (hex color string) and `settings.NUM.ELEVEN` (number) to compute placement and color.
+ */
 function drawNotice(ctx, bounds, settings) {
   ctx.save();
   ctx.fillStyle = addAlpha(settings.palette.ink, 0.72);
@@ -659,10 +771,22 @@ function drawNotice(ctx, bounds, settings) {
   ctx.restore();
 }
 
+/**
+ * Return an RGBA CSS color string by applying an alpha value to a hex color.
+ * @param {string} hexColor - 3- or 6-digit hex color (with or without leading '#').
+ * @param {number} alpha - Opacity in the range [0, 1].
+ * @return {string} CSS `rgba(r, g, b, a)` string.
+ */
 function addAlpha(hexColor, alpha) {
   return hexToRgba(hexColor, alpha);
 }
 
+/**
+ * Convert a 3- or 6-digit hex color (with or without a leading `#`) into a CSS `rgba(r, g, b, a)` string using the provided alpha.
+ * @param {string} hex - Hex color in `#rrggbb`, `rrggbb`, `#rgb`, or `rgb` form.
+ * @param {number} alpha - Opacity between 0 and 1.
+ * @return {string} CSS `rgba(...)` color string.
+ */
 function hexToRgba(hex, alpha) {
   let raw = hex.replace("#", "");
   if (raw.length === 3) {
