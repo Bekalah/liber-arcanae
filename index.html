@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Cosmic Helix Renderer (ND-safe, Offline)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <style>
+    /* ND-safe: calm contrast, no motion, generous spacing */
+    :root {
+      --bg:#0a1419;
+      --ink:#f2f7f7;
+      --muted:#8fb4b4;
+    }
+    html,body {
+      margin:0;
+      padding:0;
+      background:var(--bg);
+      color:var(--ink);
+      font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    header {
+      padding:12px 16px;
+      border-bottom:1px solid rgba(143,180,180,0.24);
+    }
+    .status {
+      color:var(--muted);
+      font-size:12px;
+    }
+    #stage {
+      display:block;
+      margin:16px auto;
+      box-shadow:0 0 0 1px rgba(143,180,180,0.32);
+      background:var(--bg);
+    }
+    .note {
+      max-width:900px;
+      margin:0 auto 16px;
+      color:var(--muted);
+    }
+    code {
+      background:rgba(10,20,25,0.8);
+      padding:2px 4px;
+      border-radius:3px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>Cosmic Helix Renderer</strong> — layered sacred geometry (offline, ND-safe)</div>
+    <div class="status" id="status">Loading palette…</div>
+  </header>
+
+  <canvas id="stage" width="1440" height="900" aria-label="Layered sacred geometry canvas"></canvas>
+  <p class="note">This static renderer encodes Vesica, Tree-of-Life, Fibonacci, and a static double-helix lattice. No animation, no autoplay, no external libraries. Open this file directly for offline use.</p>
+
+  <script type="module">
+    import { renderHelix } from "./js/helix-renderer.mjs";
+
+    const elStatus = document.getElementById("status");
+    const canvas = document.getElementById("stage");
+    const ctx = canvas.getContext("2d");
+
+    async function loadJSON(path) {
+      try {
+        const res = await fetch(path, { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error(String(res.status));
+        }
+        return await res.json();
+      } catch (err) {
+        return null;
+      }
+    }
+
+    const defaults = {
+      palette: {
+        bg:"#0a1419",
+        ink:"#f2f7f7",
+        layers:["#4ab6b6","#7bd389","#f2d184","#d1b3ff","#f8c0c8","#9fd0ff"]
+      }
+    };
+
+    const palette = await loadJSON("./data/palette.json");
+    const active = palette || defaults.palette;
+    elStatus.textContent = palette ? "Palette loaded." : "Palette missing; using safe fallback.";
+
+    // Numerology constants used by geometry routines
+    const NUM = {
+      THREE:3,
+      SEVEN:7,
+      NINE:9,
+      ELEVEN:11,
+      TWENTYTWO:22,
+      THIRTYTHREE:33,
+      NINETYNINE:99,
+      ONEFORTYFOUR:144
+    };
+
+    // ND-safe rationale: no motion, high readability, soft layered colors.
+    renderHelix(ctx, {
+      width:canvas.width,
+      height:canvas.height,
+      palette:active,
+      NUM,
+      notice:palette ? null : "Palette data missing — fallback in use."
+    });
+  </script>
+</body>
+</html>
