@@ -29,6 +29,21 @@ const DEFAULT_PALETTE = {
   layers: ["#b1c7ff", "#89f7fe", "#a0ffa1", "#ffd27f", "#f5a3ff", "#d0d0e6"]
 };
 
+/**
+ * Render a static, layered "helix" composition onto a 2D canvas.
+ *
+ * Draws four deterministic layers (vesica grid, Tree-of-Life scaffold, Fibonacci-inspired spiral, and a double-helix lattice)
+ * into the provided canvas context using a normalized palette and numeric layout constants.
+ *
+ * If `ctx` is falsy the function returns immediately. `options` may override canvas dimensions and rendering parameters:
+ * - options.width, options.height: explicit canvas size to use instead of ctx.canvas dimensions.
+ * - options.NUM: partial override of numeric layout constants (merged with module DEFAULT_NUM).
+ * - options.palette: custom palette object (merged via normalisePalette).
+ *
+ * @param {CanvasRenderingContext2D} ctx - The 2D rendering context to draw into.
+ * @param {Object} [options] - Optional overrides for size, numeric constants, and palette.
+ * @returns {void}
+ */
 export function renderHelix(ctx, options = {}) {
   if (!ctx) {
     return;
@@ -56,6 +71,16 @@ export function renderHelix(ctx, options = {}) {
   ctx.restore();
 }
 
+/**
+ * Normalize a palette by merging a partial custom palette with defaults and ensuring layer order/length.
+ *
+ * Merges `custom` over DEFAULT_PALETTE and guarantees `palette.layers` has the same length and order
+ * as DEFAULT_PALETTE.layers: provided layer colors replace defaults at the same indices, and any
+ * missing entries fall back to the default colors.
+ *
+ * @param {Object} [custom] - Partial palette; may include `bg`, `ink`, and `layers` (an array of color strings).
+ * @return {Object} A new palette object with defaults applied and a fully populated `layers` array.
+ */
 function normalisePalette(custom) {
   const palette = { ...DEFAULT_PALETTE, ...(custom || {}) };
   const baseLayers = DEFAULT_PALETTE.layers;
@@ -64,6 +89,12 @@ function normalisePalette(custom) {
   return palette;
 }
 
+/**
+ * Fill the full canvas area with the palette background color.
+ *
+ * The function preserves the canvas context state and uses palette.bg as the fill style.
+ * @param {{bg: string}} palette - Palette object whose `bg` color is used to fill the rectangle.
+ */
 function fillBackground(ctx, width, height, palette) {
   ctx.save();
   ctx.fillStyle = palette.bg;
@@ -71,6 +102,20 @@ function fillBackground(ctx, width, height, palette) {
   ctx.restore();
 }
 
+/**
+ * Draws a grid of overlapping circles (a vesica field) and a central paired vesica.
+ *
+ * Renders a soft, semi-transparent lattice of circles arranged in NUM.NINE rows and NUM.SEVEN columns,
+ * with circle radius derived from the smaller canvas dimension (radius = min(width, height) / NUM.ELEVEN).
+ * After the grid is drawn, two larger central circles (scaled by NUM.THIRTYTHREE / NUM.TWENTYTWO) are
+ * drawn as a paired vesica centered on the canvas.
+ *
+ * @param {Object} dims - Layout dimensions.
+ * @param {number} dims.width - Canvas width in pixels.
+ * @param {number} dims.height - Canvas height in pixels.
+ * @param {Object} palette - Normalized palette; uses palette.layers[0] for the field color.
+ * @param {Object} NUM - Numeric constants used for sizing and spacing (expects keys like NINE, SEVEN, ELEVEN, THIRTYTHREE, TWENTYTWO, THREE).
+ */
 function drawVesicaField(ctx, dims, palette, NUM) {
   const { width, height } = dims;
   const rows = NUM.NINE; // 9 rows encode triple triads.
@@ -111,6 +156,19 @@ function drawVesicaField(ctx, dims, palette, NUM) {
   ctx.restore();
 }
 
+/**
+ * Render a Tree-of-Life scaffold: positioned sephirot (nodes) and connecting paths.
+ *
+ * The function computes a 10-node layout proportionally from `dims` using numeric
+ * constants from `NUM`, strokes the inter-node paths with `palette.layers[1]`,
+ * and draws filled node discs (with a subtle inner stroke) using `palette.layers[2]`
+ * and `palette.ink`. All drawing is performed directly on the provided canvas context.
+ *
+ * @param {CanvasRenderingContext2D} ctx - 2D canvas context to draw into.
+ * @param {{width:number, height:number}} dims - Rendering bounds; used to derive node positions and spacing.
+ * @param {{layers: string[], ink: string}} palette - Color palette (expects at least three layer colors and an ink color).
+ * @param {object} NUM - Numeric constants (e.g., SEVEN, NINE, ELEVEN, THIRTYTHREE) used for spacing and sizing.
+ */
 function drawTreeOfLife(ctx, dims, palette, NUM) {
   const { width, height } = dims;
   const centerX = width / 2;
@@ -176,6 +234,21 @@ function drawTreeOfLife(ctx, dims, palette, NUM) {
   ctx.restore();
 }
 
+/**
+ * Draws a static, logarithmic "Fibonacci-inspired" spiral and subtle point markers.
+ *
+ * Generates a smooth spiral centered at a fractional position of the canvas using
+ * a geometric radius interpolation from a small start radius to a larger final radius
+ * over NUM.NINETYNINE steps (approximately 1.5 rotations). The spiral polyline is stroked
+ * with palette.layers[3]. Quiet circular markers are filled on every NUM.ELEVEN-th point
+ * using palette.layers[4].
+ *
+ * Does not return a value; renders directly to the provided 2D canvas context.
+ *
+ * @param {{width: number, height: number}} dims - Canvas dimensions (uses width and height to compute center and radii).
+ * @param {Object} palette - Normalized palette; expects layer colors at indices 3 (curve) and 4 (markers).
+ * @param {Object} NUM - Numeric constants used for layout (expects NINETYNINE, THREE, TWENTYTW O? NO; expects ONEFORTYFOUR, ELEVEN, THREE, TWENTYTWO, NINETYNINE). 
+ */
 function drawFibonacciCurve(ctx, dims, palette, NUM) {
   const { width, height } = dims;
   const centre = { x: width * 0.27, y: height * 0.62 };
@@ -214,6 +287,21 @@ function drawFibonacciCurve(ctx, dims, palette, NUM) {
   ctx.restore();
 }
 
+/**
+ * Render a static double-helix pair with connecting lattice rungs and anchor circles.
+ *
+ * Draws two phase-shifted helix polylines inside the given drawing bounds, connects them
+ * with regularly spaced "rungs", and paints four soft anchor disks at the top and bottom.
+ *
+ * Parameters:
+ * - dims.width / dims.height: bounding box used to compute helix placement and scale.
+ * - palette.layers[4] and palette.layers[5] are used for the two helix strands; palette.ink
+ *   is used for the lattice rungs and subdued anchors use the last helix layer color.
+ * - NUM controls numeric layout constants (expects at least ELEVEN, NINETYNINE, TWENTYTWO,
+ *   SEVEN, THREE, and NINE).
+ *
+ * Side effects: issues drawing commands on the provided 2D canvas rendering context (no return).
+ */
 function drawDoubleHelix(ctx, dims, palette, NUM) {
   const { width, height } = dims;
   const helixHeight = height * 0.72;
@@ -279,6 +367,14 @@ function drawDoubleHelix(ctx, dims, palette, NUM) {
   ctx.restore();
 }
 
+/**
+ * Stroke an open polyline through a sequence of 2D points on the provided canvas context.
+ *
+ * Draws straight segments from the first point to each subsequent point and calls ctx.stroke().
+ * The path is not closed. If `points` is empty the function returns without drawing.
+ *
+ * @param {Array<{x: number, y: number}>} points - Ordered array of points with numeric `x` and `y`.
+ */
 function strokePolyline(ctx, points) {
   if (points.length === 0) {
     return;
