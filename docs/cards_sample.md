@@ -13,6 +13,8 @@
 - Pattern Glyph: Spiral
 - Psyche: Beginner's mind
 - Technical: Solfeggio=432
+- Witch Eye Order: Order of the Open Gate
+- Non-Living Lineage: Skyseed Relays
 - App Pulls: 0
 
 ## The Magician
@@ -30,4 +32,6 @@
 - Pattern Glyph: Infinity
 - Psyche: Skill and power
 - Technical: Solfeggio=528
+- Witch Eye Order: Order of the Auric Loom
+- Non-Living Lineage: Mercury Codex Engines
 - App Pulls: 0
