@@ -18,6 +18,7 @@
  * @property {number} height
  * @property {{ bg:string, ink:string, layers:string[] }} palette
  * @property {{ THREE:number, SEVEN:number, NINE:number, ELEVEN:number, TWENTYTWO:number, THIRTYTHREE:number, NINETYNINE:number, ONEFORTYFOUR:number }} NUM
+ * @property {string|null} [notice]
  */
 
 /**
@@ -26,7 +27,7 @@
  * @param {RenderOptions} options
  */
 export function renderHelix(ctx, options) {
-  const { width, height, palette, NUM } = options;
+  const { width, height, palette, NUM, notice = null } = options;
   const layerColors = normalizeLayers(palette.layers);
 
   clearCanvas(ctx, palette.bg, width, height);
@@ -41,6 +42,9 @@ export function renderHelix(ctx, options) {
   });
   drawFibonacciCurve(ctx, { width, height, stroke: layerColors[3], NUM });
   drawDoubleHelix(ctx, { width, height, strokeA: layerColors[4], strokeB: layerColors[5], NUM });
+  if (notice) {
+    drawNotice(ctx, { width, palette, message: notice, NUM });
+  }
 }
 
 function normalizeLayers(colors) {
@@ -62,17 +66,17 @@ function clearCanvas(ctx, color, width, height) {
 function drawVesicaField(ctx, { width, height, stroke, NUM }) {
   ctx.save();
   ctx.strokeStyle = stroke;
-  ctx.globalAlpha = 0.42; // Soft overlay to avoid harsh contrast.
+  ctx.globalAlpha = NUM.THIRTYTHREE / (NUM.SEVEN * NUM.ELEVEN); // Soft overlay derived from 33/(7*11) to stay gentle.
   ctx.lineWidth = 2;
 
   const centerX = width / 2;
   const centerY = height / 2;
   const baseRadius = Math.min(width, height) / NUM.THREE;
-  const horizontalStep = baseRadius / NUM.SEVEN * 3;
-  const verticalStep = baseRadius / NUM.NINE * 2.2;
+  const horizontalStep = (baseRadius / NUM.SEVEN) * NUM.THREE;
+  const verticalStep = (baseRadius / NUM.NINE) * 2.2;
 
-  const columns = [ -1, 0, 1 ];
-  const rows = [-3, -2, -1, 0, 1, 2, 3]; // 7 rows to echo the 7 levels.
+  const columns = [-1, 0, 1];
+  const rows = [-3, -2, -1, 0, 1, 2, 3]; // Seven rows echo the seven levels.
 
   columns.forEach((col) => {
     rows.forEach((row) => {
@@ -113,8 +117,8 @@ function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, N
   ];
 
   const paths = [
-    [0,1],[0,2],[1,3],[1,5],[2,4],[2,5],[3,5],[3,7],[4,5],[4,6],
-    [5,6],[5,7],[5,8],[6,9],[7,9],[8,9],[9,10],[7,8],[1,4],[2,3],[3,6],[4,6]
+    [0, 1], [0, 2], [1, 3], [1, 5], [2, 4], [2, 5], [3, 5], [3, 7], [4, 5], [4, 6],
+    [5, 6], [5, 7], [5, 8], [6, 9], [7, 9], [8, 9], [9, 10], [7, 8], [1, 4], [2, 3], [3, 6], [4, 6],
   ];
 
   ctx.strokeStyle = pathStroke;
@@ -135,7 +139,7 @@ function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, N
   ctx.lineWidth = 1.5;
   ctx.globalAlpha = 1;
 
-  const nodeRadius = Math.max(11, Math.min(width, height) / NUM.TWENTYTWO);
+  const nodeRadius = Math.max(NUM.ELEVEN, Math.min(width, height) / NUM.TWENTYTWO);
   nodes.forEach((node) => {
     ctx.beginPath();
     ctx.arc(node.x, node.y, nodeRadius, 0, Math.PI * 2);
@@ -144,7 +148,8 @@ function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, N
   });
 
   ctx.fillStyle = textColor;
-  ctx.font = "14px system-ui";
+  const fontSize = Math.round(NUM.ONEFORTYFOUR / NUM.NINE); // 144/9 anchors the label scale at 16px.
+  ctx.font = `${fontSize}px system-ui`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   nodes.forEach((node) => {
@@ -164,7 +169,7 @@ function drawFibonacciCurve(ctx, { width, height, stroke, NUM }) {
   const centerX = width * 0.72;
   const centerY = height * 0.58;
   const baseRadius = Math.min(width, height) / NUM.ELEVEN;
-  const steps = NUM.NINE; // nine turns keep the spiral grounded.
+  const steps = Math.floor(NUM.NINETYNINE / NUM.ELEVEN); // 99/11 = 9 segments keep the spiral grounded.
 
   const points = createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM });
 
@@ -184,7 +189,7 @@ function drawFibonacciCurve(ctx, { width, height, stroke, NUM }) {
 function createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM }) {
   const points = [];
   for (let i = 0; i <= steps; i += 1) {
-    const theta = (Math.PI / NUM.THREE) * i; // 60° increments.
+    const theta = (Math.PI / NUM.THREE) * i; // 60 degree increments keep the motion static and predictable.
     const radius = baseRadius * Math.pow(phi, i / NUM.SEVEN);
     points.push({
       x: centerX + Math.cos(theta) * radius,
@@ -216,7 +221,7 @@ function drawDoubleHelix(ctx, { width, height, strokeA, strokeB, NUM }) {
     const nodeA = strandA[Math.floor(t * (strandA.length - 1))];
     const nodeB = strandB[Math.floor(t * (strandB.length - 1))];
     ctx.strokeStyle = blendColors(strokeA, strokeB, 0.5);
-    ctx.globalAlpha = 0.45;
+    ctx.globalAlpha = NUM.THIRTYTHREE / NUM.NINETYNINE; // Crossbars hold at one third opacity to keep depth gentle.
     ctx.beginPath();
     ctx.moveTo(nodeA.x, nodeA.y);
     ctx.lineTo(nodeB.x, nodeB.y);
@@ -231,7 +236,7 @@ function createHelixPoints({ top, bottom, centerX, amplitude, strands, phase, NU
   for (let i = 0; i <= strands; i += 1) {
     const t = i / strands;
     const y = top + (bottom - top) * t;
-    const angle = t * Math.PI * (NUM.NINE / NUM.THREE) + phase; // 3 full waves.
+    const angle = t * Math.PI * (NUM.NINE / NUM.THREE) + phase; // Three full waves stay static.
     const x = centerX + Math.sin(angle) * amplitude;
     points.push({ x, y });
   }
@@ -262,4 +267,16 @@ function blendColors(colorA, colorB, ratio) {
   const [r2, g2, b2] = parse(colorB);
   const mix = (a, b) => Math.round(a + (b - a) * ratio);
   return `rgb(${mix(r1, r2)}, ${mix(g1, g2)}, ${mix(b1, b2)})`;
+}
+
+function drawNotice(ctx, { width, palette, message, NUM }) {
+  ctx.save();
+  ctx.fillStyle = palette.ink;
+  ctx.globalAlpha = NUM.NINE / NUM.ONEFORTYFOUR; // 9/144 keeps the notice subtle.
+  const fontSize = Math.round(NUM.ONEFORTYFOUR / NUM.NINE);
+  ctx.font = `${fontSize}px system-ui`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  ctx.fillText(message, width / 2, fontSize);
+  ctx.restore();
 }
