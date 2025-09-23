@@ -62,17 +62,17 @@ function clearCanvas(ctx, color, width, height) {
 function drawVesicaField(ctx, { width, height, stroke, NUM }) {
   ctx.save();
   ctx.strokeStyle = stroke;
-  ctx.globalAlpha = 0.42; // Soft overlay to avoid harsh contrast.
+  ctx.globalAlpha = NUM.THIRTYTHREE / NUM.NINETYNINE; // 33/99 keeps the vesica field gentle.
   ctx.lineWidth = 2;
 
   const centerX = width / 2;
   const centerY = height / 2;
-  const baseRadius = Math.min(width, height) / NUM.THREE;
-  const horizontalStep = baseRadius / NUM.SEVEN * 3;
-  const verticalStep = baseRadius / NUM.NINE * 2.2;
+  const baseRadius = Math.min(width, height) / (NUM.ONEFORTYFOUR / NUM.NINE);
+  const horizontalStep = baseRadius * (NUM.ELEVEN / NUM.SEVEN);
+  const verticalStep = baseRadius * (NUM.NINE / NUM.ELEVEN);
 
-  const columns = [ -1, 0, 1 ];
-  const rows = [-3, -2, -1, 0, 1, 2, 3]; // 7 rows to echo the 7 levels.
+  const columns = [-1, 0, 1];
+  const rows = [-3, -2, -1, 0, 1, 2, 3]; // Seven rows echoing the 7 heavens.
 
   columns.forEach((col) => {
     rows.forEach((row) => {
@@ -93,29 +93,29 @@ function drawCircle(ctx, x, y, radius) {
 
 function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, NUM }) {
   ctx.save();
-  const top = height * 0.18;
-  const bottom = height * 0.82;
+  const top = height * (NUM.ELEVEN / NUM.ONEFORTYFOUR);
+  const bottom = height * (NUM.ONEFORTYFOUR - NUM.ELEVEN) / NUM.ONEFORTYFOUR;
   const centerX = width * 0.5;
-  const columnOffset = width / NUM.THREE / 2.4;
-  const rowStep = (bottom - top) / 3.5;
+  const columnOffset = width / (NUM.ONEFORTYFOUR / NUM.THIRTYTHREE);
+  const rowStep = (bottom - top) / (NUM.NINE - NUM.THREE);
 
   const nodes = [
     { name: "1", x: centerX, y: top },
-    { name: "2", x: centerX + columnOffset, y: top + rowStep * 0.9 },
-    { name: "3", x: centerX - columnOffset, y: top + rowStep * 0.9 },
-    { name: "4", x: centerX + columnOffset * 1.4, y: top + rowStep * 2 },
-    { name: "5", x: centerX - columnOffset * 1.4, y: top + rowStep * 2 },
-    { name: "6", x: centerX, y: top + rowStep * 2.8 },
-    { name: "7", x: centerX - columnOffset, y: top + rowStep * 3.6 },
-    { name: "8", x: centerX + columnOffset, y: top + rowStep * 3.6 },
-    { name: "9", x: centerX, y: bottom - rowStep * 0.6 },
+    { name: "2", x: centerX + columnOffset, y: top + rowStep * (NUM.NINE / NUM.SEVEN) },
+    { name: "3", x: centerX - columnOffset, y: top + rowStep * (NUM.NINE / NUM.SEVEN) },
+    { name: "4", x: centerX + columnOffset * (NUM.THIRTYTHREE / NUM.TWENTYTWO), y: top + rowStep * (NUM.THIRTYTHREE / NUM.TWENTYTWO) },
+    { name: "5", x: centerX - columnOffset * (NUM.THIRTYTHREE / NUM.TWENTYTWO), y: top + rowStep * (NUM.THIRTYTHREE / NUM.TWENTYTWO) },
+    { name: "6", x: centerX, y: top + rowStep * (NUM.TWENTYTWO / NUM.NINE) },
+    { name: "7", x: centerX - columnOffset, y: top + rowStep * (NUM.NINE / NUM.THREE) },
+    { name: "8", x: centerX + columnOffset, y: top + rowStep * (NUM.NINE / NUM.THREE) },
+    { name: "9", x: centerX, y: bottom - rowStep * (NUM.NINE / NUM.TWENTYTWO) },
     { name: "10", x: centerX, y: bottom },
   ];
 
   const paths = [
     [0,1],[0,2],[1,3],[1,5],[2,4],[2,5],[3,5],[3,7],[4,5],[4,6],
-    [5,6],[5,7],[5,8],[6,9],[7,9],[8,9],[9,10],[7,8],[1,4],[2,3],[3,6],[4,6]
-  ];
+    [5,6],[5,7],[5,8],[6,9],[7,9],[8,9],[9,10],[7,8],[1,4],[2,3],[3,6],[2,6]
+  ]; // 22 connective paths echo the major arcana count.
 
   ctx.strokeStyle = pathStroke;
   ctx.globalAlpha = 0.85;
@@ -135,7 +135,7 @@ function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, N
   ctx.lineWidth = 1.5;
   ctx.globalAlpha = 1;
 
-  const nodeRadius = Math.max(11, Math.min(width, height) / NUM.TWENTYTWO);
+  const nodeRadius = Math.max(NUM.ELEVEN, Math.min(width, height) / (NUM.ONEFORTYFOUR / NUM.THREE));
   nodes.forEach((node) => {
     ctx.beginPath();
     ctx.arc(node.x, node.y, nodeRadius, 0, Math.PI * 2);
@@ -158,13 +158,13 @@ function drawFibonacciCurve(ctx, { width, height, stroke, NUM }) {
   ctx.save();
   ctx.strokeStyle = stroke;
   ctx.lineWidth = 3;
-  ctx.globalAlpha = 0.78;
+  ctx.globalAlpha = NUM.NINETYNINE / (NUM.ONEFORTYFOUR + NUM.NINETYNINE);
 
   const phi = (1 + Math.sqrt(5)) / 2; // Fibonacci growth rate.
-  const centerX = width * 0.72;
-  const centerY = height * 0.58;
-  const baseRadius = Math.min(width, height) / NUM.ELEVEN;
-  const steps = NUM.NINE; // nine turns keep the spiral grounded.
+  const centerX = width * (NUM.ONEFORTYFOUR - NUM.THIRTYTHREE) / NUM.ONEFORTYFOUR;
+  const centerY = height * (NUM.NINETYNINE / (NUM.ONEFORTYFOUR + NUM.THIRTYTHREE));
+  const baseRadius = Math.min(width, height) / (NUM.ONEFORTYFOUR / NUM.SEVEN);
+  const steps = Math.floor(NUM.NINETYNINE / NUM.ELEVEN); // Nine turns keep the spiral grounded.
 
   const points = createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM });
 
@@ -184,7 +184,7 @@ function drawFibonacciCurve(ctx, { width, height, stroke, NUM }) {
 function createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM }) {
   const points = [];
   for (let i = 0; i <= steps; i += 1) {
-    const theta = (Math.PI / NUM.THREE) * i; // 60° increments.
+    const theta = (Math.PI * NUM.THIRTYTHREE / NUM.NINETYNINE) * i; // 60° increments (33/99 reduces to 1/3).
     const radius = baseRadius * Math.pow(phi, i / NUM.SEVEN);
     points.push({
       x: centerX + Math.cos(theta) * radius,
@@ -196,27 +196,27 @@ function createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM }) {
 
 function drawDoubleHelix(ctx, { width, height, strokeA, strokeB, NUM }) {
   ctx.save();
-  const top = height * 0.12;
-  const bottom = height * 0.88;
-  const centerX = width * 0.32;
-  const amplitude = width / NUM.THREE / 2.2;
+  const top = height * (NUM.SEVEN / NUM.ONEFORTYFOUR);
+  const bottom = height * (NUM.ONEFORTYFOUR - NUM.SEVEN) / NUM.ONEFORTYFOUR;
+  const centerX = width / (NUM.TWENTYTWO / NUM.SEVEN);
+  const amplitude = width / (NUM.NINETYNINE / NUM.ELEVEN);
   const strands = NUM.THIRTYTHREE; // 33 to echo the spine.
 
   const strandA = createHelixPoints({ top, bottom, centerX, amplitude, strands, phase: 0, NUM });
   const strandB = createHelixPoints({ top, bottom, centerX, amplitude, strands, phase: Math.PI, NUM });
 
   ctx.lineWidth = 2.5;
-  ctx.globalAlpha = 0.9;
+  ctx.globalAlpha = (NUM.ONEFORTYFOUR - NUM.NINE) / NUM.ONEFORTYFOUR;
   drawPolyline(ctx, strandA, strokeA);
   drawPolyline(ctx, strandB, strokeB);
 
-  const latticeLines = NUM.ELEVEN;
+  const latticeLines = Math.floor(NUM.NINETYNINE / NUM.NINE);
   for (let i = 0; i <= latticeLines; i += 1) {
     const t = i / latticeLines;
     const nodeA = strandA[Math.floor(t * (strandA.length - 1))];
     const nodeB = strandB[Math.floor(t * (strandB.length - 1))];
     ctx.strokeStyle = blendColors(strokeA, strokeB, 0.5);
-    ctx.globalAlpha = 0.45;
+    ctx.globalAlpha = (NUM.TWENTYTWO / NUM.ONEFORTYFOUR) * NUM.THREE;
     ctx.beginPath();
     ctx.moveTo(nodeA.x, nodeA.y);
     ctx.lineTo(nodeB.x, nodeB.y);
@@ -231,7 +231,7 @@ function createHelixPoints({ top, bottom, centerX, amplitude, strands, phase, NU
   for (let i = 0; i <= strands; i += 1) {
     const t = i / strands;
     const y = top + (bottom - top) * t;
-    const angle = t * Math.PI * (NUM.NINE / NUM.THREE) + phase; // 3 full waves.
+    const angle = t * Math.PI * (NUM.NINETYNINE / NUM.THIRTYTHREE) + phase; // 3 full waves via 99/33.
     const x = centerX + Math.sin(angle) * amplitude;
     points.push({ x, y });
   }
