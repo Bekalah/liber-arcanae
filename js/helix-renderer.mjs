@@ -1,3 +1,21 @@
+
+/**
+ * Render a static, ND-safe layered sacred-geometry scene onto a Canvas 2D context.
+ *
+ * Draws four ordered layers (vesica field, Tree of Life scaffold, Fibonacci curve,
+ * and double-helix lattice) into the provided canvas context using pure, deterministic
+ * drawing routines. The function clears the canvas, fills the background from the
+ * normalized palette, computes drawing dimensions, renders layers in a fixed order,
+ * and restores the canvas state.
+ *
+ * @param {CanvasRenderingContext2D} ctx - Destination 2D rendering context.
+ * @param {Object} options - Rendering options.
+ * @param {number} options.width - Canvas width in pixels.
+ * @param {number} options.height - Canvas height in pixels.
+ * @param {Object|undefined} options.palette - Optional palette object; normalized defaults are used when missing.
+ * @param {Object} options.NUM - Numeric constants/config used by the layer renderers.
+ */
+
 /*
   helix-renderer.mjs
   ND-safe static renderer for layered sacred geometry.
@@ -13,6 +31,7 @@
   explicit parameters. Comments document ND-safe rationale (no motion,
   calm palette, respectful layer ordering).
 */
+
 
 export function renderHelix(ctx, options) {
   const { width, height, palette, NUM } = options;
@@ -33,6 +52,20 @@ export function renderHelix(ctx, options) {
   ctx.restore();
 }
 
+/**
+ * Normalize a user-supplied color palette into a deterministic object with bg, ink, and layers.
+ *
+ * Uses the provided palette properties when present; falls back to sensible defaults:
+ * - bg defaults to "#0b0b12"
+ * - ink defaults to "#e8e8f0"
+ * - layers defaults to ["#9fb8ff","#89f7fe","#a0ffa1","#ffd27f","#f5a3ff","#d0d0e6"] when missing or empty
+ *
+ * @param {Object} [palette] - Optional palette overrides.
+ * @param {string} [palette.bg] - Background color (CSS string).
+ * @param {string} [palette.ink] - Foreground/ink color (CSS string).
+ * @param {string[]} [palette.layers] - Array of layer color strings; used only if non-empty.
+ * @return {{bg: string, ink: string, layers: string[]}} Normalized palette suitable for rendering.
+ */
 function normalizePalette(palette) {
   const layers = Array.isArray(palette?.layers) && palette.layers.length > 0
     ? palette.layers
@@ -86,6 +119,18 @@ function normalizePalette(raw) {
 }
 
 
+/**
+ * Draws a vesica piscis (two intersecting circles) with concentric rings.
+ *
+ * Renders a horizontally offset pair of circles centered on dims.centerX/centerY,
+ * then draws additional scaled rings around each circle to form a layered vesica field.
+ * Uses translucent strokes and a fixed line width to produce a soft, ND-safe appearance.
+ *
+ * @param {{centerX:number,centerY:number,width:number,height:number}} dims - Canvas dimensions and center coordinates.
+ * @param {string|CanvasGradient|CanvasPattern} color - Stroke color (CSS color string, gradient, or pattern).
+ * @param {object} NUM - Numeric constants object; this function reads NUM.THREE, NUM.SEVEN, and NUM.ELEVEN to compute sizes and ring counts.
+ */
+
 function drawVesicaField(ctx, dims, color, NUM) {
   // ND-safe: translucent layers avoid harsh contrast while keeping geometry legible.
   const { centerX, centerY, width, height } = dims;
@@ -111,6 +156,16 @@ function drawVesicaField(ctx, dims, color, NUM) {
   ctx.restore();
 }
 
+/**
+ * Draws a simplified Tree of Life scaffold: 10 softly glowing nodes connected by 22 translucent paths.
+ *
+ * Positions nodes using dims.width and dims.height with spacing derived from NUM constants. Paths are stroked
+ * with colors[0] (or a default) at reduced alpha; nodes are filled circles with colors[1] (or a default) at higher alpha.
+ *
+ * @param {Object} dims - Layout measurements; the function requires dims.width and dims.height to compute node positions.
+ * @param {string[]} colors - Palette for the layer. colors[0] is used for paths, colors[1] for node fills; defaults are used if entries are missing.
+ * @param {Object} NUM - Numeric constants object used to scale padding, rows/columns, and node radius.
+ */
 function drawTreeOfLife(ctx, dims, colors, NUM) {
   // ND-safe: soft glow nodes, clean paths, referencing 10 spheres + 22 paths.
   const { width, height } = dims;
@@ -165,6 +220,17 @@ function drawTreeOfLife(ctx, dims, colors, NUM) {
   ctx.restore();
 }
 
+/**
+ * Draws a static Fibonacci/logarithmic-style curve as a single stroked polyline.
+ *
+ * Generates a sequence of points radiating from the canvas center using the golden
+ * ratio (φ) to scale radii and a fixed angular step, then strokes them once with
+ * a semi-transparent line to produce a calm, ND-safe spiral-like curve.
+ *
+ * @param {Object} dims - Drawing dimensions; must include numeric `centerX` and `height`.
+ * @param {string|CanvasPattern|CanvasGradient} color - Stroke color used for the curve.
+ * @param {Object} NUM - Numeric constants object. This function reads NUM.NINETYNINE, NUM.SEVEN, NUM.TWENTYTWO and NUM.ELEVEN to compute spacing, step count, and radial scaling.
+ */
 function drawFibonacciCurve(ctx, dims, color, NUM) {
   // ND-safe: single stroke polyline; no animated arcs.
   const { centerX, height } = dims;
@@ -342,6 +408,18 @@ function drawFibonacciCurve(ctx, dims, palette, NUM) {
 }
 
 
+/**
+ * Draws a static double-helix lattice (two strands with cross rungs) onto the provided canvas context.
+ *
+ * Renders two phase-shifted sine-wave strands across the canvas width and connects sampled corresponding points
+ * with short "rungs" to suggest a double-helix lattice. Uses semi-transparent strokes and sensible defaults
+ * when strand colors are missing.
+ *
+ * @param {Object} dims - Layout metrics: { width: number, height: number, centerX?: number, centerY?: number }.
+ * @param {string[]} colors - Array supplying strand colors: [strandAColor, strandBColor]. Defaults used if entries are falsy.
+ * @param {Object} NUM - Numeric constants object used for proportions and segment counts (expects properties such as NINE, ONEFORTYFOUR, THIRTYTHREE, TWENTYTWO).
+ */
+
 function drawHelixLattice(ctx, dims, colors, NUM) {
   // ND-safe: static lattice referencing double helix archetype without motion.
   const { width, height } = dims;
@@ -397,12 +475,26 @@ function drawHelixLattice(ctx, dims, colors, NUM) {
   }
 }
 
+/**
+ * Stroke a circular outline at the given canvas coordinates.
+ *
+ * Uses the canvas context's current path and stroke style to render a circle.
+ *
+ * @param {number} x - Center x position in canvas pixels.
+ * @param {number} y - Center y position in canvas pixels.
+ * @param {number} radius - Circle radius in pixels.
+ */
 function drawCircle(ctx, x, y, radius) {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.stroke();
 }
 
+/**
+ * Stroke a polyline through an ordered list of points on the given canvas context.
+ *
+ * @param {Array<{x:number,y:number}>} points - Ordered array of point objects defining the polyline vertices; the first point is the moveTo origin and subsequent points are connected with lines.
+ */
 function drawPolyline(ctx, points) {
   ctx.beginPath();
   for (let i = 0; i < points.length; i++) {
