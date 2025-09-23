@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "narrative_nodes": [
+    {
+      "id": "C144N-ARCANA-HIEROPHANT",
+      "title": "Moonchild Hierophant",
+      "realm": "magical-mystery-house",
+      "tarot_overlays": ["LA-05-HIEROPHANT"],
+      "archetype": "Hierophant Moonchild",
+      "function": ["teaching", "prompting", "protection"],
+      "presets": {
+        "lesson": ["3-step practice", "reflection", "export log"],
+        "music": [396, 741, 852],
+        "geometry": ["vesica", "rose", "tree-of-life"]
+      },
+      "annex": {
+        "lineage": ["Surrealism (Max Ernst)", "Vienna Fantastic Realism", "Hermetic Qabalah"],
+        "bibliography": ["fortune:mystical-qabalah"]
+      },
+      "safety": {"motion": "calm", "autoplay": false, "aura": true}
+    }
+  ]
+}
