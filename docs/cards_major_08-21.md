@@ -17,6 +17,8 @@
 - Thought-form: Taming the lion
 - HGA Fragment: Heart of valor
 - Faction: Sulphur
+- Witch Eye Order: Order of the Lion's Vigil
+- Non-Living Lineage: Solar Resonant Shields
 - App Pulls: Courage trials in circuitum99
 - Technical: ND-safe golden-red halo, 417 Hz tone
 
@@ -37,6 +39,8 @@
 - Thought-form: Light in the dark
 - HGA Fragment: Flame of gnosis
 - Faction: Mercury
+- Witch Eye Order: Order of the Lantern Spiral
+- Non-Living Lineage: Phosphor Archives
 - App Pulls: Hermit cave in Mystery House
 - Technical: ND-safe lantern glow, 741 Hz tone
 
@@ -57,6 +61,8 @@
 - Thought-form: Ever-turning wheel
 - HGA Fragment: Spin of fate
 - Faction: Salt
+- Witch Eye Order: Order of the Turning Orrery
+- Non-Living Lineage: Clockwork Orreries
 - App Pulls: Fortuna chamber in Stone-Grimoire
 - Technical: Rotating mandala overlay, 528 Hz tone
 
@@ -77,6 +83,8 @@
 - Thought-form: Balance of forces
 - HGA Fragment: Feather of Ma'at
 - Faction: Salt
+- Witch Eye Order: Order of the Feathered Scale
+- Non-Living Lineage: Gyroscopic Aegis Tablets
 - App Pulls: Hall of Scales in Mystery House
 - Technical: Balanced overlay, 741 Hz tone
 
@@ -97,6 +105,8 @@
 - Thought-form: Vision in stillness
 - HGA Fragment: Breath of sacrifice
 - Faction: Mercury
+- Witch Eye Order: Order of the Mirror Bridge
+- Non-Living Lineage: Suspended Silver Roots
 - App Pulls: Yggdrasil branch portal
 - Technical: Inverted cross overlay, 963 Hz tone
 
@@ -117,6 +127,8 @@
 - Thought-form: Death is passage
 - HGA Fragment: Bone key
 - Faction: Ash
+- Witch Eye Order: Order of the Veiled Gate
+- Non-Living Lineage: Bone Choir Reliquaries
 - App Pulls: Ann Abyss grimoire portal
 - Technical: Void halo overlay, ND-safe 963 Hz tone
 
@@ -137,6 +149,8 @@
 - Thought-form: Alchemy of opposites
 - HGA Fragment: Cup of Sophia
 - Faction: Mercury
+- Witch Eye Order: Order of the Prism Chalice
+- Non-Living Lineage: Distillation Wings
 - App Pulls: Alchemy lab portal
 - Technical: Prism halo overlay, harmonic tones
 
@@ -157,6 +171,8 @@
 - Thought-form: Trickster's riddle
 - HGA Fragment: Mirror chain
 - Faction: Ash
+- Witch Eye Order: Order of the Ember Chain
+- Non-Living Lineage: Iron Sigil Familiars
 - App Pulls: Zidaryen riddle grove
 - Technical: ND-safe paradox overlay, 285 Hz tone
 
@@ -177,6 +193,8 @@
 - Thought-form: Tower falls
 - HGA Fragment: Thunder sigil
 - Faction: Sulphur
+- Witch Eye Order: Order of the Thunder Glyph
+- Non-Living Lineage: Storm Bastion Relays
 - App Pulls: Tower collapse trial
 - Technical: Lightning overlay, 417 Hz tone
 
@@ -197,6 +215,8 @@
 - Thought-form: Star of guidance
 - HGA Fragment: Vessel of stars
 - Faction: Mercury
+- Witch Eye Order: Order of the Argent Mirror
+- Non-Living Lineage: Starwell Lenses; Celestial Memory Pools
 - App Pulls: Star temple portal
 - Technical: ND-safe star overlay, 852 Hz tone
 
@@ -217,6 +237,8 @@
 - Thought-form: Lunar vision
 - HGA Fragment: Lunar thread
 - Faction: Mercury
+- Witch Eye Order: Order of the Vespertine Tide
+- Non-Living Lineage: Dreamstone Oracles
 - App Pulls: Vespertine dream gate
 - Technical: ND-safe moon halo, 852 Hz tone
 
@@ -237,6 +259,8 @@
 - Thought-form: Inner sun
 - HGA Fragment: Solar core
 - Faction: Sulphur
+- Witch Eye Order: Order of the Solar Choir
+- Non-Living Lineage: Heliacal Disc Arrays
 - App Pulls: Solar chamber in Stone-Grimoire
 - Technical: Solar overlay, 528 Hz tone
 
@@ -257,6 +281,8 @@
 - Thought-form: Call to awakening
 - HGA Fragment: Breath of Gabriel
 - Faction: Mercury
+- Witch Eye Order: Order of the Resonant Trumpet
+- Non-Living Lineage: Awakening Horn Arrays
 - App Pulls: Judgment hall in circuitum99
 - Technical: ND-safe trumpet overlay, 963 Hz tone
 
@@ -277,6 +303,17 @@
 - Thought-form: All is One
 - HGA Fragment: World egg
 - Faction: Inner Order
+- Witch Eye Order: Order of the Ouroboric Gate
+- Non-Living Lineage: Worldskin Looms
 - App Pulls: World gate in circuitum99 + Codex 144:99
 - Technical: ND-safe Ouroboros overlay, 963 Hz tone
 
+
+## Appendix — Starter Canvas Demo
+Open `index.html` in the repository root to explore the ND-safe starter canvas. This offline page layers the Vesica field, Tree-of-Life scaffold, Fibonacci curve, and double helix lattice for readers who want to engage interactively.
+
+<div style="max-width:900px;margin:0 auto;border:1px solid #1d1d2a;">
+  <iframe src="../index.html" title="Starter Canvas" width="100%" height="920" style="border:0; background:#0b0b12; color:#e8e8f0;"></iframe>
+</div>
+
+*If the inline frame does not render in your Markdown viewer, open `index.html` directly to experience the canvas appendix.*
