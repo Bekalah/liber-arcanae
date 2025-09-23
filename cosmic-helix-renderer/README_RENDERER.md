@@ -16,6 +16,11 @@ ND-safe, offline-first canvas composition that encodes the layered cosmology req
 ## Palette
 Update the calm palette in `data/palette.json` if needed. Each color supports AA contrast against the deep background. Avoid high saturation flashes to keep the experience ND-safe.
 
+## Numerology Constants
+- **3, 7, 9:** Set vesica spacing increments, helix wave cadence, and Fibonacci angle steps.
+- **11, 22, 33:** Govern Tree-of-Life node radii, path count, and helix strand totals.
+- **99, 144:** Regulate opacity ratios, field extents, and lattice crossbars so the layers stay proportioned and calm.
+
 ## Offline + Safety Notes
 - There are no external dependencies or network requests beyond the optional palette load.
 - Motion is absent; reduced-motion users see an identical static composition.
