@@ -23,6 +23,23 @@ def suit(n):
     return "majors"
 
 def map_freq(ray):
+    """
+    Map a textual ray descriptor to a Solfeggio frequency (Hz).
+    
+    Given a ray name or descriptor string, returns a numeric frequency mapped by keyword:
+    - "violet" -> 963
+    - "indigo" or "silver" -> 852
+    - any of "gold", "emerald", "green", "aquamarine", "turquoise" -> 528
+    - "crimson" -> 417
+    - "scarlet" or "red" -> 285
+    If no keywords match or input is falsy, returns the default 432.
+    
+    Parameters:
+        ray (str | None): Ray descriptor or name (case-insensitive).
+    
+    Returns:
+        int: Corresponding frequency in Hz.
+    """
     r = (ray or "").lower()
     if "violet" in r: return 963
     if "indigo" in r or "silver" in r: return 852
@@ -32,6 +49,18 @@ def map_freq(ray):
     return 432
 
 def parse_list(value):
+    """
+    Normalize a delimited string into a list of non-empty, trimmed items.
+    
+    Replaces semicolons with commas, splits on commas, trims whitespace from each item,
+    and filters out empty entries. Returns an empty list when input is falsy.
+    
+    Parameters:
+        value (str | None): A comma/semicolon-delimited string.
+    
+    Returns:
+        list[str]: The list of trimmed, non-empty tokens.
+    """
     if not value:
         return []
     cleaned = value.replace(';', ',')
