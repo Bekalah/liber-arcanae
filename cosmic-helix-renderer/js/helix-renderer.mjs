@@ -59,6 +59,18 @@ function clearCanvas(ctx, color, width, height) {
   ctx.restore();
 }
 
+/**
+ * Draws a gentle vesica field: a 3×7 grid of overlapping circles centered on the canvas.
+ *
+ * The circles are stroked with the provided color and rendered with reduced opacity (33/99)
+ * to produce a soft overlay. Radii and horizontal/vertical spacing are computed from the
+ * supplied NUM numeric-constants object so sizes scale consistently across canvases.
+ *
+ * @param {number} width - Canvas width in pixels.
+ * @param {number} height - Canvas height in pixels.
+ * @param {string} stroke - Stroke color used for the circle outlines.
+ * @param {Object} NUM - Numeric constants used to derive scale factors (e.g., ONEFORTYFOUR, NINE, ELEVEN, SEVEN, THIRTYTHREE, NINETYNINE).
+ */
 function drawVesicaField(ctx, { width, height, stroke, NUM }) {
   ctx.save();
   ctx.strokeStyle = stroke;
@@ -91,6 +103,23 @@ function drawCircle(ctx, x, y, radius) {
   ctx.stroke();
 }
 
+/**
+ * Draws a Tree-of-Life scaffold (10 labeled nodes and 22 connecting paths) onto the canvas.
+ *
+ * Positions and spacing are computed from the supplied width/height and the NUM constant ratios.
+ * The function renders:
+ *  - 10 circular nodes labeled "1"–"10"
+ *  - 22 straight-line connections between nodes (classic Tree-of-Life layout)
+ * Node radii, vertical bounds, column offsets and row steps are all derived from the NUM numeric map to keep layout scale-independent.
+ *
+ * @param {Object} options - Rendering options (see fields).
+ * @param {number} options.width - Canvas width used to compute layout.
+ * @param {number} options.height - Canvas height used to compute layout.
+ * @param {string} options.nodeFill - CSS color used to fill each node.
+ * @param {string} options.pathStroke - CSS color used to stroke the connecting paths.
+ * @param {string} options.textColor - CSS color used for node outlines and label text.
+ * @param {Object} options.NUM - Map of numeric constants (e.g., ELEVEN, ONEFORTYFOUR, THIRTYTHREE, etc.) used for ratio-driven geometry.
+ */
 function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, NUM }) {
   ctx.save();
   const top = height * (NUM.ELEVEN / NUM.ONEFORTYFOUR);
@@ -154,6 +183,18 @@ function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, N
   ctx.restore();
 }
 
+/**
+ * Draws a Fibonacci (logarithmic) spiral polyline onto the provided canvas context.
+ *
+ * Uses NUM-driven scaling to compute the spiral's center, base radius, and number of turns,
+ * then obtains points via createSpiralPoints and strokes a connected polyline with the given color.
+ *
+ * @param {Object} options - Rendering options.
+ * @param {number} options.width - Canvas width in pixels.
+ * @param {number} options.height - Canvas height in pixels.
+ * @param {string} options.stroke - Stroke color to use for the spiral.
+ * @param {Object} options.NUM - Numeric-constants object (e.g., NUM.NINETYNINE, NUM.ONEFORTYFOUR) used to compute sizes and ratios.
+ */
 function drawFibonacciCurve(ctx, { width, height, stroke, NUM }) {
   ctx.save();
   ctx.strokeStyle = stroke;
@@ -181,6 +222,22 @@ function drawFibonacciCurve(ctx, { width, height, stroke, NUM }) {
   ctx.restore();
 }
 
+/**
+ * Generate points along a logarithmic (Fibonacci-style) spiral.
+ *
+ * Produces an array of {x, y} coordinates sampled at integer steps from 0..steps.
+ * Each point's angle advances by (π * NUM.THIRTYTHREE / NUM.NINETYNINE) per step
+ * and the radius grows multiplicatively by phi^(i / NUM.SEVEN).
+ *
+ * @param {object} options
+ * @param {number} options.steps - Number of steps (samples) along the spiral.
+ * @param {number} options.baseRadius - Radius at step 0.
+ * @param {number} options.phi - Growth factor (e.g., golden ratio) applied per NUM.SEVEN fraction of a step.
+ * @param {number} options.centerX - X coordinate of the spiral center.
+ * @param {number} options.centerY - Y coordinate of the spiral center.
+ * @param {object} options.NUM - Numeric constants object; used for fractional constants (e.g., NUM.THIRTYTHREE / NUM.NINETYNINE and NUM.SEVEN).
+ * @return {Array<{x:number,y:number}>} Array of points describing the spiral polyline.
+ */
 function createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM }) {
   const points = [];
   for (let i = 0; i <= steps; i += 1) {
@@ -194,6 +251,20 @@ function createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM }) {
   return points;
 }
 
+/**
+ * Draws a double-helix lattice: two phase-shifted helical strands plus transverse crossbars.
+ *
+ * Renders two helices spanning a vertical region derived from the canvas height and the
+ * NUM proportions, strokes each strand with the provided colors, and draws evenly spaced
+ * connecting lines between corresponding points on the strands to form a lattice.
+ *
+ * @param {Object} options - Rendering options.
+ * @param {number} options.width - Canvas width in pixels.
+ * @param {number} options.height - Canvas height in pixels.
+ * @param {string} options.strokeA - CSS color for the first strand.
+ * @param {string} options.strokeB - CSS color for the second strand.
+ * @param {Object} options.NUM - Numeric-constants object used to compute proportions (required).
+ */
 function drawDoubleHelix(ctx, { width, height, strokeA, strokeB, NUM }) {
   ctx.save();
   const top = height * (NUM.SEVEN / NUM.ONEFORTYFOUR);
@@ -226,6 +297,19 @@ function drawDoubleHelix(ctx, { width, height, strokeA, strokeB, NUM }) {
   ctx.restore();
 }
 
+/**
+ * Generate a vertical sequence of (x,y) points forming a sinusoidal helix between two Y bounds.
+ *
+ * @param {Object} params
+ * @param {number} params.top - Y coordinate of the helix top.
+ * @param {number} params.bottom - Y coordinate of the helix bottom.
+ * @param {number} params.centerX - Horizontal center around which the helix oscillates.
+ * @param {number} params.amplitude - Horizontal amplitude of the sine wave.
+ * @param {number} params.strands - Number of segments (intervals) to divide the vertical span into; the function returns strands+1 points including both endpoints.
+ * @param {number} params.phase - Phase offset (radians) added to the sinusoidal angle.
+ * @param {Object} params.NUM - Numeric constants object used for angle scaling (expects properties like NINETYNINE and THIRTYTHREE).
+ * @return {Array<{x: number, y: number}>} Array of points {x,y} sampled evenly in Y from top to bottom producing a horizontally oscillating helix.
+ */
 function createHelixPoints({ top, bottom, centerX, amplitude, strands, phase, NUM }) {
   const points = [];
   for (let i = 0; i <= strands; i += 1) {
