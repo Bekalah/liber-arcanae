@@ -52,6 +52,16 @@ function normalizeLayers(colors) {
   return safe;
 }
 
+/**
+ * Fill the entire canvas with a solid background color while preserving the canvas state.
+ *
+ * Saves and restores the drawing context so existing context settings (transforms, styles, alpha, etc.)
+ * are not affected.
+ *
+ * @param {string} color - CSS color string used to fill the canvas (e.g., '#000', 'rgba(0,0,0,1)').
+ * @param {number} width - Canvas width in pixels.
+ * @param {number} height - Canvas height in pixels.
+ */
 function clearCanvas(ctx, color, width, height) {
   ctx.save();
   ctx.fillStyle = color;
@@ -60,15 +70,16 @@ function clearCanvas(ctx, color, width, height) {
 }
 
 /**
- * Render a gentle vesica-field grid of stroked circles centered on the canvas.
+ * Render a gentle vesica-field: a centered 3×7 grid of overlapping stroked circles.
  *
- * Draws a 3×7 arrangement of overlapping circles (a vesica-like field) centered at (width/2, height/2).
- * Circle radius, horizontal and vertical spacing, and the drawing alpha are computed from the provided
- * NUM constants so the layout scales predictably with different NUM configurations. The function temporarily
- * modifies canvas drawing state (strokeStyle, globalAlpha, lineWidth) but restores the context before returning.
+ * Circles are arranged around (width/2, height/2). Radius, horizontal/vertical spacing,
+ * and drawing alpha are derived from the provided NUM constants so the composition
+ * scales consistently across different canvas sizes and NUM configurations.
+ * The function temporarily modifies canvas state (strokeStyle, globalAlpha, lineWidth)
+ * and restores it before returning.
  *
- * @param {string} stroke - Stroke color used for the circles (any Canvas fill/stroke color string).
- * @param {Object} NUM - Numeric constants object (e.g., { THREE, SEVEN, NINE, ELEVEN, THIRTYTHREE, NINETYNINE, ONEFORTYFOUR }) used to compute radius, spacing, and alpha.
+ * @param {string} stroke - Stroke color for the circle outlines (any valid canvas color string).
+ * @param {Object} NUM - Numeric constants used to compute geometry and alpha (e.g., tokens like THREE, SEVEN, NINE, ELEVEN, THIRTYTHREE, NINETYNINE, ONEFORTYFOUR).
  */
 function drawVesicaField(ctx, { width, height, stroke, NUM }) {
   ctx.save();
@@ -96,6 +107,15 @@ function drawVesicaField(ctx, { width, height, stroke, NUM }) {
   ctx.restore();
 }
 
+/**
+ * Draws an outlined circle centered at (x, y) with the given radius on the provided canvas context.
+ *
+ * Uses the context's current strokeStyle and lineWidth; does not fill the circle.
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D rendering context to draw on.
+ * @param {number} x - X coordinate of the circle center.
+ * @param {number} y - Y coordinate of the circle center.
+ * @param {number} radius - Radius of the circle in pixels.
+ */
 function drawCircle(ctx, x, y, radius) {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -103,20 +123,20 @@ function drawCircle(ctx, x, y, radius) {
 }
 
 /**
- * Render a simplified "Tree of Life" scaffold: connected sephirot nodes with numeric labels.
+ * Render a scaled "Tree of Life" scaffold: ten sephirot nodes connected by twenty-two paths with centered numeric labels.
  *
- * Draws 10 positioned nodes, 22 connecting paths, and centered numeric labels. Positions,
- * spacing, node radius, and alpha values are derived from the provided NUM constants so
- * the layout scales consistently with the renderer's numeric tokens.
+ * Positions, spacing, node radius, and transparency are derived from the provided NUM numeric tokens so the layout
+ * scales consistently with the renderer's token-based proportions. The function draws connection paths first, then
+ * filled circular nodes with stroked outlines and centered numeric labels.
  *
- * @param {CanvasRenderingContext2D} ctx - Canvas 2D rendering context.
- * @param {Object} options
+ * @param {Object} options - Rendering options.
  * @param {number} options.width - Canvas width in pixels.
  * @param {number} options.height - Canvas height in pixels.
- * @param {string} options.nodeFill - Fill color for nodes (CSS color string or hex).
- * @param {string} options.pathStroke - Stroke color for connecting paths.
- * @param {string} options.textColor - Color used for node outlines and labels.
- * @param {Object} options.NUM - Numeric constants object (e.g., THREE, SEVEN, NINE, ELEVEN, TWENTYTWO, THIRTYTHREE, NINETYNINE, ONEFORTYFOUR) used to compute layout and sizing.
+ * @param {string} options.nodeFill - Fill color for the node discs (CSS color or hex).
+ * @param {string} options.pathStroke - Stroke color used for connecting paths.
+ * @param {string} options.textColor - Color used for node outlines and numeric labels.
+ * @param {Object} options.NUM - Numeric constants object (e.g., THREE, SEVEN, NINE, ELEVEN, TWENTYTWO, THIRTYTHREE, NINETYNINE, ONEFORTYFOUR)
+ *   used to compute layout, spacing, radii, and alpha values.
  */
 function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, NUM }) {
   ctx.save();
@@ -248,16 +268,16 @@ function createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM }) {
 }
 
 /**
- * Render a double-helix lattice: two sinusoidal strands with periodic crossbars.
+ * Render a double-helix lattice onto the given canvas context.
  *
- * Draws two phase-shifted helix polylines vertically between computed top and bottom bounds,
- * then connects corresponding points with evenly spaced crossbars to form a lattice. The
- * function writes directly to the provided CanvasRenderingContext2D (no return value).
+ * Draws two vertically oriented, phase-shifted sinusoidal strands and connects corresponding
+ * sample points with evenly spaced crossbars to form a lattice. This function paints directly
+ * to the provided CanvasRenderingContext2D and does not return a value.
  *
- * @param {string} strokeA - CSS color for the first helix strand.
- * @param {string} strokeB - CSS color for the second helix strand.
- * @param {object} NUM - Numeric constants object (e.g., THREE, SEVEN, NINE, etc.) used to scale
- *                       positions, amplitudes, counts, and alpha values for the helix geometry.
+ * @param {object} NUM - Numeric-constant tokens used to scale geometry, spacing, amplitudes,
+ *                       strand counts and alpha values for the helix and lattice.  The function
+ *                       reads values such as SEVEN, NINE, TWENTYTWO, THIRTYTHREE, NINETYNINE
+ *                       and ONEFORTYFOUR to compute positions and opacities.
  */
 function drawDoubleHelix(ctx, { width, height, strokeA, strokeB, NUM }) {
   ctx.save();
@@ -292,20 +312,16 @@ function drawDoubleHelix(ctx, { width, height, strokeA, strokeB, NUM }) {
 }
 
 /**
- * Generate a sequence of 2D points describing a vertical helix (sinusoidal) between two Y bounds.
+ * Generate a vertical helix as a sequence of 2D points (sinusoidal X displacement) from top to bottom.
  *
- * Produces (strands + 1) points from y = top to y = bottom where the horizontal offset is a sine
- * wave of given amplitude. The angular frequency of the wave is scaled using NUM (expected numeric
- * tokens), and `phase` shifts the waveform.
+ * Returns an array of (strands + 1) points evenly spaced in Y from `top` to `bottom`. Each point's
+ * X coordinate is computed as `centerX + Math.sin(angle) * amplitude`, where `angle` advances with
+ * normalized position and is scaled using the provided NUM tokens.
  *
- * @param {number} top - Y coordinate of the helix start (top).
- * @param {number} bottom - Y coordinate of the helix end (bottom).
- * @param {number} centerX - Central X coordinate around which the helix oscillates.
- * @param {number} amplitude - Peak horizontal displacement from centerX.
- * @param {number} strands - Number of segments; the function returns strands + 1 points (inclusive).
- * @param {number} phase - Phase offset (radians) applied to the sine wave.
- * @param {Object} NUM - Numeric constants object used to scale the helix frequency (expects properties like NINETYNINE and THIRTYTHREE).
- * @return {Array<{x: number, y: number}>} Array of points along the helix, in order from top to bottom.
+ * @param {number} strands - Number of segments along the helix; the result contains `strands + 1` points (inclusive endpoints).
+ * @param {number} phase - Phase offset in radians applied to the sine wave.
+ * @param {Object} NUM - Numeric-constants object used to scale helix frequency (expects tokens such as `NINETYNINE` and `THIRTYTHREE`).
+ * @return {Array<{x: number, y: number}>} Points ordered from top to bottom describing the helix strand.
  */
 function createHelixPoints({ top, bottom, centerX, amplitude, strands, phase, NUM }) {
   const points = [];
