@@ -3,10 +3,12 @@
 ND-safe, offline-first canvas composition that encodes the layered cosmology requested for Liber Arcanae.
 
 ## Structure
-- **Layer 1 — Vesica Field:** Interlocking circles arranged in a 3x7 grid (21 vessels) referencing the 33 spine and 21 pillars.
-- **Layer 2 — Tree-of-Life Scaffold:** Ten numbered nodes with 22 connective paths. Coordinates are parameterized with the numerology constants so spacing stays proportional.
-- **Layer 3 — Fibonacci Curve:** Static polyline approximating a logarithmic spiral using the golden ratio. No animation or automated motion is present.
-- **Layer 4 — Double Helix Lattice:** Two static braids (33 segments) linked by eleven crossbars to echo the helix motif without movement.
+- **Layer 1 - Vesica Field:** Interlocking circles arranged in a 3x7 grid (21 vessels) referencing the 33 spine and 21 pillars.
+- **Layer 2 - Tree-of-Life Scaffold:** Ten numbered nodes with 22 connective paths. Coordinates are parameterized with the numerology constants so spacing stays proportional.
+- **Layer 3 - Fibonacci Curve:** Static polyline approximating a logarithmic spiral using the golden ratio. No animation or automated motion is present.
+- **Layer 4 - Double Helix Lattice:** Two static braids (33 segments) linked by eleven crossbars to echo the helix motif without movement.
+
+Numerology anchors: 3, 7, 9, 11, 22, 33, 99, and 144 appear in the geometry math to respect the requested harmonic ratios.
 
 ## Usage
 1. Open `index.html` directly in any modern browser (double-click from Finder/Explorer). No build tools or servers are required.
@@ -19,5 +21,5 @@ Update the calm palette in `data/palette.json` if needed. Each color supports AA
 ## Offline + Safety Notes
 - There are no external dependencies or network requests beyond the optional palette load.
 - Motion is absent; reduced-motion users see an identical static composition.
-- Canvas dimensions are fixed at 1440×900 to keep the geometry ratios stable.
+- Canvas dimensions are fixed at 1440x900 to keep the geometry ratios stable.
 - Comments throughout the code explain layer ordering and safety considerations.

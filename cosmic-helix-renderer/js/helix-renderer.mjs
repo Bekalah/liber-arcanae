@@ -30,6 +30,7 @@ export function renderHelix(ctx, options) {
   const layerColors = normalizeLayers(palette.layers);
 
   clearCanvas(ctx, palette.bg, width, height);
+  // Layer order stays consistent for ND-safe legibility: field -> scaffold -> spiral -> helix.
   drawVesicaField(ctx, { width, height, stroke: layerColors[0], NUM });
   drawTreeOfLife(ctx, {
     width,
@@ -67,7 +68,8 @@ function drawVesicaField(ctx, { width, height, stroke, NUM }) {
 
   const centerX = width / 2;
   const centerY = height / 2;
-  const baseRadius = Math.min(width, height) / NUM.THREE;
+  const baseRadius = Math.min(width, height) /
+    (NUM.THREE + (NUM.ONEFORTYFOUR / NUM.NINETYNINE)); // 3 harmonics plus 144:99 ratio.
   const horizontalStep = baseRadius / NUM.SEVEN * 3;
   const verticalStep = baseRadius / NUM.NINE * 2.2;
 
@@ -184,7 +186,7 @@ function drawFibonacciCurve(ctx, { width, height, stroke, NUM }) {
 function createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM }) {
   const points = [];
   for (let i = 0; i <= steps; i += 1) {
-    const theta = (Math.PI / NUM.THREE) * i; // 60° increments.
+    const theta = (Math.PI / NUM.THREE) * i; // 60 degree increments.
     const radius = baseRadius * Math.pow(phi, i / NUM.SEVEN);
     points.push({
       x: centerX + Math.cos(theta) * radius,
@@ -210,7 +212,7 @@ function drawDoubleHelix(ctx, { width, height, strokeA, strokeB, NUM }) {
   drawPolyline(ctx, strandA, strokeA);
   drawPolyline(ctx, strandB, strokeB);
 
-  const latticeLines = NUM.ELEVEN;
+  const latticeLines = Math.floor(NUM.ONEFORTYFOUR / NUM.NINE); // 16 crossbars referencing 144 nodes over nine phases.
   for (let i = 0; i <= latticeLines; i += 1) {
     const t = i / latticeLines;
     const nodeA = strandA[Math.floor(t * (strandA.length - 1))];
