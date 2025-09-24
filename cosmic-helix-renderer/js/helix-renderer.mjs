@@ -52,6 +52,17 @@ function normalizeLayers(colors) {
   return safe;
 }
 
+/**
+ * Fill the entire canvas area with a solid color.
+ *
+ * Fills the rectangle from (0,0) to (width,height) on the provided canvas
+ * context with the specified CSS color. The canvas state is saved and
+ * restored so the caller's drawing state (transforms, styles, etc.) is preserved.
+ *
+ * @param {string} color - Any valid CSS color used to fill the background.
+ * @param {number} width - Width of the area to fill, in pixels.
+ * @param {number} height - Height of the area to fill, in pixels.
+ */
 function clearCanvas(ctx, color, width, height) {
   ctx.save();
   ctx.fillStyle = color;
@@ -97,6 +108,13 @@ function drawVesicaField(ctx, { width, height, stroke, NUM }) {
   ctx.restore();
 }
 
+/**
+ * Draws an outlined circle (stroke only) at the specified canvas coordinates.
+ *
+ * @param {number} x - X coordinate of the circle center in pixels.
+ * @param {number} y - Y coordinate of the circle center in pixels.
+ * @param {number} radius - Radius of the circle in pixels.
+ */
 function drawCircle(ctx, x, y, radius) {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -186,14 +204,16 @@ function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, N
 /**
  * Draws a Fibonacci (logarithmic) spiral polyline onto the provided canvas context.
  *
- * Uses NUM-driven scaling to compute the spiral's center, base radius, and number of turns,
- * then obtains points via createSpiralPoints and strokes a connected polyline with the given color.
+ * The spiral's center, base radius, opacity, and number of turns are derived from the supplied
+ * width/height and the NUM constants; points are produced by createSpiralPoints and stroked
+ * with the provided color.
  *
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D rendering context to draw into.
  * @param {Object} options - Rendering options.
  * @param {number} options.width - Canvas width in pixels.
  * @param {number} options.height - Canvas height in pixels.
- * @param {string} options.stroke - Stroke color to use for the spiral.
- * @param {Object} options.NUM - Numeric-constants object (e.g., NUM.NINETYNINE, NUM.ONEFORTYFOUR) used to compute sizes and ratios.
+ * @param {string} options.stroke - Stroke color used to render the spiral.
+ * @param {Object} options.NUM - Numeric-constants object that controls scaling and opacity.
  */
 function drawFibonacciCurve(ctx, { width, height, stroke, NUM }) {
   ctx.save();
@@ -252,18 +272,19 @@ function createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM }) {
 }
 
 /**
- * Draws a double-helix lattice: two phase-shifted helical strands plus transverse crossbars.
+ * Render a double-helix lattice: two phase-shifted sinusoidal strands with regular crossbars.
  *
- * Renders two helices spanning a vertical region derived from the canvas height and the
- * NUM proportions, strokes each strand with the provided colors, and draws evenly spaced
- * connecting lines between corresponding points on the strands to form a lattice.
+ * Draws two helical polylines spanning a vertical band derived from the canvas size and the
+ * provided NUM proportions, strokes each strand with the specified colors, and draws evenly
+ * spaced transverse lines between corresponding points on the strands to form a lattice.
  *
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D rendering context to draw into.
  * @param {Object} options - Rendering options.
- * @param {number} options.width - Canvas width in pixels.
- * @param {number} options.height - Canvas height in pixels.
+ * @param {number} options.width - Canvas width in pixels; used to compute horizontal layout and amplitude.
+ * @param {number} options.height - Canvas height in pixels; used to compute vertical bounds.
  * @param {string} options.strokeA - CSS color for the first strand.
  * @param {string} options.strokeB - CSS color for the second strand.
- * @param {Object} options.NUM - Numeric-constants object used to compute proportions (required).
+ * @param {Object} options.NUM - Numeric constants object (scaling ratios) used to compute positions, counts, and opacities.
  */
 function drawDoubleHelix(ctx, { width, height, strokeA, strokeB, NUM }) {
   ctx.save();
