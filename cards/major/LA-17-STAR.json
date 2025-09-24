@@ -4,8 +4,6 @@
   "qabalistic_path": "Tzaddi",
   "color_tone": {"hex": "#7FB3FF", "note": "F#", "hz": 369},
   "lineage": ["Emma Kunz"],
-  "witch_eye_orders": ["Order of the Argent Mirror"],
-  "non_living_lineages": ["Starwell Lenses", "Celestial Memory Pools"],
   "study_seed": "The laws of healing revealed in geometric form.",
   "helpers": {"calm_overlay": true, "unlock_paths": [17, 33]},
   "art_recipe": {"layers": [{"type": "sigil", "sdf": true}, {"type": "rose_window", "fps": 10}]},
