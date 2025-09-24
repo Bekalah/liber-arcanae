@@ -60,14 +60,15 @@ function clearCanvas(ctx, color, width, height) {
 }
 
 /**
- * Draws a gentle grid of overlapping circle outlines (a vesica field) centered on the canvas.
+ * Render a gentle vesica-field grid of stroked circles centered on the canvas.
  *
- * Renders a 3×7 lattice of circles around the canvas center using the provided stroke color
- * and NUM-derived geometry and alpha factors. The function saves and restores canvas state
- * and mutates the context by stroking multiple circle outlines.
+ * Draws a 3×7 arrangement of overlapping circles (a vesica-like field) centered at (width/2, height/2).
+ * Circle radius, horizontal and vertical spacing, and the drawing alpha are computed from the provided
+ * NUM constants so the layout scales predictably with different NUM configurations. The function temporarily
+ * modifies canvas drawing state (strokeStyle, globalAlpha, lineWidth) but restores the context before returning.
  *
- * @param {Object} props - Rendering parameters (properties object).
- * @param {Object} props.NUM - Numeric constants used to compute radii, steps and alpha (e.g., NUM.THIRTYTHREE, NUM.NINETYNINE, NUM.ONEFORTYFOUR, NUM.NINE, NUM.ELEVEN, NUM.SEVEN). Necessary for consistent, parameterized layout across the renderer.
+ * @param {string} stroke - Stroke color used for the circles (any Canvas fill/stroke color string).
+ * @param {Object} NUM - Numeric constants object (e.g., { THREE, SEVEN, NINE, ELEVEN, THIRTYTHREE, NINETYNINE, ONEFORTYFOUR }) used to compute radius, spacing, and alpha.
  */
 function drawVesicaField(ctx, { width, height, stroke, NUM }) {
   ctx.save();
@@ -102,19 +103,20 @@ function drawCircle(ctx, x, y, radius) {
 }
 
 /**
- * Render a labeled "Tree of Life" scaffold (10 nodes, 22 links) onto the 2D canvas.
+ * Render a simplified "Tree of Life" scaffold: connected sephirot nodes with numeric labels.
  *
- * Draws ten circular nodes numbered "1"–"10" arranged between computed top and bottom
- * bounds, connects them with 22 straight-line paths, fills nodes with `nodeFill`,
- * strokes paths with `pathStroke`, and renders numeric labels using `textColor`.
+ * Draws 10 positioned nodes, 22 connecting paths, and centered numeric labels. Positions,
+ * spacing, node radius, and alpha values are derived from the provided NUM constants so
+ * the layout scales consistently with the renderer's numeric tokens.
  *
- * @param {Object} options - Rendering options.
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D rendering context.
+ * @param {Object} options
  * @param {number} options.width - Canvas width in pixels.
  * @param {number} options.height - Canvas height in pixels.
- * @param {string} options.nodeFill - CSS fill style for node interiors.
- * @param {string} options.pathStroke - CSS stroke style for connecting paths.
- * @param {string} options.textColor - CSS color used for node outlines and labels.
- * @param {Object} options.NUM - Numeric constants used to scale placement and sizes (expects keys like ELEVEN, NINE, THIRTYTHREE, ONEFORTYFOUR, etc.).
+ * @param {string} options.nodeFill - Fill color for nodes (CSS color string or hex).
+ * @param {string} options.pathStroke - Stroke color for connecting paths.
+ * @param {string} options.textColor - Color used for node outlines and labels.
+ * @param {Object} options.NUM - Numeric constants object (e.g., THREE, SEVEN, NINE, ELEVEN, TWENTYTWO, THIRTYTHREE, NINETYNINE, ONEFORTYFOUR) used to compute layout and sizing.
  */
 function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, NUM }) {
   ctx.save();
@@ -180,14 +182,16 @@ function drawTreeOfLife(ctx, { width, height, nodeFill, pathStroke, textColor, N
 }
 
 /**
- * Draws a logarithmic "Fibonacci" spiral on the provided 2D canvas context.
+ * Draws a Fibonacci (logarithmic) spiral as a stroked polyline onto the provided canvas context.
  *
- * Uses the golden ratio (phi) and NUM-driven layout constants to compute a sequence
- * of spiral points, then strokes a polyline through those points. The routine
- * temporarily adjusts stroke style, line width, and global alpha; canvas state is
- * saved and restored.
+ * The spiral's size, position, number of turns, and alpha are derived from the supplied NUM constants
+ * so the geometry scales consistently with the rest of the composition.
  *
- * @param {Object} NUM - Numeric constants object that controls proportions, alpha and step counts (e.g. NUM.NINETYNINE, NUM.ONEFORTYFOUR, NUM.THIRTYTHREE, NUM.SEVEN, NUM.ELEVEN).
+ * @param {number} width - Canvas width used to position/scale the spiral.
+ * @param {number} height - Canvas height used to position/scale the spiral.
+ * @param {string} stroke - Stroke style (CSS color) used to draw the spiral line.
+ * @param {Object} NUM - Numeric tokens object (e.g., NUM.SEVEN, NUM.NINETYNINE) controlling scale and steps.
+ */
 function drawFibonacciCurve(ctx, { width, height, stroke, NUM }) {
   ctx.save();
   ctx.strokeStyle = stroke;
@@ -216,22 +220,20 @@ function drawFibonacciCurve(ctx, { width, height, stroke, NUM }) {
 }
 
 /**
- * Generate an array of points along a logarithmic (Fibonacci-style) spiral.
+ * Generate an array of (x,y) points tracing a logarithmic spiral (Fibonacci-style).
  *
- * Produces (steps + 1) {x,y} coordinates sampled from a spiral centered at
- * (centerX, centerY). Radius grows multiplicatively by `phi` every NUM.SEVEN
- * steps fraction (radius = baseRadius * phi^(i/NUM.SEVEN)). Angular increment
- * per step is (π * NUM.THIRTYTHREE / NUM.NINETYNINE).
+ * The spiral starts at radius `baseRadius` and grows by factor `phi` every `NUM.SEVEN`
+ * steps; angles advance by (π * NUM.THIRTYTHREE / NUM.NINETYNINE) per step. The loop
+ * is inclusive, so the returned array contains `steps + 1` points.
  *
  * @param {Object} params
- * @param {number} params.steps - Number of segments; the function returns steps+1 points (inclusive).
- * @param {number} params.baseRadius - Starting radius in pixels at i=0.
- * @param {number} params.phi - Growth factor (e.g., golden ratio) used to scale radius.
- * @param {number} params.centerX - X coordinate of the spiral center in pixels.
- * @param {number} params.centerY - Y coordinate of the spiral center in pixels.
- * @param {Object} params.NUM - Numeric constants object used to parametrize angular and radial scaling (expects NUM.SEVEN, NUM.THIRTYTHREE, NUM.NINETYNINE).
- * @return {Array<{x:number,y:number}>} Array of point objects forming the spiral polyline.
- */
+ * @param {number} params.steps - Number of discrete steps (segments) to generate.
+ * @param {number} params.baseRadius - Initial radius at step 0.
+ * @param {number} params.phi - Radial growth multiplier (typically the golden ratio).
+ * @param {number} params.centerX - X coordinate of the spiral center.
+ * @param {number} params.centerY - Y coordinate of the spiral center.
+ * @param {Object} params.NUM - Numeric constants object used to compute angle increment and radial scaling.
+ * @return {{x: number, y: number}[]} Array of point objects in canvas coordinates. */
 function createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM }) {
   const points = [];
   for (let i = 0; i <= steps; i += 1) {
@@ -246,15 +248,16 @@ function createSpiralPoints({ steps, baseRadius, phi, centerX, centerY, NUM }) {
 }
 
 /**
- * Draws a braided double-helix with a lattice of crossbars.
+ * Render a double-helix lattice: two sinusoidal strands with periodic crossbars.
  *
- * Renders two phase-shifted helix strands and evenly spaced connecting lines between them.
- * Geometry (positions, amplitude, strand count, opacities, and lattice density) is driven by the `NUM` constants.
- * The function saves and restores the canvas state before and after drawing.
+ * Draws two phase-shifted helix polylines vertically between computed top and bottom bounds,
+ * then connects corresponding points with evenly spaced crossbars to form a lattice. The
+ * function writes directly to the provided CanvasRenderingContext2D (no return value).
  *
  * @param {string} strokeA - CSS color for the first helix strand.
  * @param {string} strokeB - CSS color for the second helix strand.
- * @param {Object} NUM - Numeric constants object used to parameterize layout and opacity (e.g., NUM.SEVEN, NUM.THIRTYTHREE, NUM.ONEFORTYFOUR).
+ * @param {object} NUM - Numeric constants object (e.g., THREE, SEVEN, NINE, etc.) used to scale
+ *                       positions, amplitudes, counts, and alpha values for the helix geometry.
  */
 function drawDoubleHelix(ctx, { width, height, strokeA, strokeB, NUM }) {
   ctx.save();
@@ -289,20 +292,20 @@ function drawDoubleHelix(ctx, { width, height, strokeA, strokeB, NUM }) {
 }
 
 /**
- * Generates a sequence of points defining a vertical helix strand.
+ * Generate a sequence of 2D points describing a vertical helix (sinusoidal) between two Y bounds.
  *
- * Each point's vertical position is linearly spaced between `top` and `bottom`, 
- * while the horizontal position oscillates sinusoidally around `centerX` with 
- * a specified amplitude and phase, producing multiple helical waves.
- * 
- * @param {number} top - The vertical starting coordinate of the helix.
- * @param {number} bottom - The vertical ending coordinate of the helix.
- * @param {number} centerX - The horizontal center position of the helix wave.
- * @param {number} amplitude - The amplitude of the horizontal oscillation.
- * @param {number} strands - The number of points (segments) to generate along the helix.
- * @param {number} phase - The horizontal phase offset applied to the sinusoidal wave.
- * @param {object} NUM - A numeric constants object used to scale helix frequency.
- * @returns {Array<{x: number, y: number}>} An array of points representing the helix strand.
+ * Produces (strands + 1) points from y = top to y = bottom where the horizontal offset is a sine
+ * wave of given amplitude. The angular frequency of the wave is scaled using NUM (expected numeric
+ * tokens), and `phase` shifts the waveform.
+ *
+ * @param {number} top - Y coordinate of the helix start (top).
+ * @param {number} bottom - Y coordinate of the helix end (bottom).
+ * @param {number} centerX - Central X coordinate around which the helix oscillates.
+ * @param {number} amplitude - Peak horizontal displacement from centerX.
+ * @param {number} strands - Number of segments; the function returns strands + 1 points (inclusive).
+ * @param {number} phase - Phase offset (radians) applied to the sine wave.
+ * @param {Object} NUM - Numeric constants object used to scale the helix frequency (expects properties like NINETYNINE and THIRTYTHREE).
+ * @return {Array<{x: number, y: number}>} Array of points along the helix, in order from top to bottom.
  */
 function createHelixPoints({ top, bottom, centerX, amplitude, strands, phase, NUM }) {
   const points = [];
