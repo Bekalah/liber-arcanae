@@ -29,7 +29,6 @@ export function renderHelix(ctx, options) {
   drawTreeOfLife(ctx, width, height, palette.ink, pickLayer(layers, 1), NUM);
   drawFibonacciCurve(ctx, width, height, pickLayer(layers, 2), NUM);
   drawHelixLattice(ctx, width, height, pickLayer(layers, 3), pickLayer(layers, 4), NUM);
-
   ctx.restore();
 }
 
