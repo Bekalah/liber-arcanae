@@ -10,6 +10,12 @@ const root = path.resolve(__dirname, '..'); // parent directory
 const server = http.createServer(async (req, res) => {
   const reqPath = path.normalize(decodeURI(req.url.split('?')[0]));
   let filePath = path.join(root, reqPath);
+  filePath = path.resolve(filePath);
+  if (!filePath.startsWith(root + path.sep)) {
+    res.writeHead(403);
+    res.end('Forbidden');
+    return;
+  }
   try {
     const info = await stat(filePath);
     if (info.isDirectory()) filePath = path.join(filePath, 'index.html');
