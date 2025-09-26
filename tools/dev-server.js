@@ -11,15 +11,29 @@ const server = http.createServer(async (req, res) => {
   const reqPath = path.normalize(decodeURI(req.url.split('?')[0]));
   let filePath = path.join(root, reqPath);
   filePath = path.resolve(filePath);
-  if (!filePath.startsWith(root + path.sep)) {
+  // Use realpath to resolve symlinks
+  let realRoot, realFilePath;
+  try {
+    realRoot = await import('node:fs/promises').then(fs => fs.realpath(root));
+    realFilePath = await import('node:fs/promises').then(fs => fs.realpath(filePath));
+  } catch (err) {
+    res.writeHead(404);
+    res.end('Not found');
+    return;
+  }
+  // Check containment: allow root dir itself and descendants
+  if (
+    !(realFilePath === realRoot ||
+      (realFilePath.startsWith(realRoot + path.sep)))
+  ) {
     res.writeHead(403);
     res.end('Forbidden');
     return;
   }
   try {
-    const info = await stat(filePath);
-    if (info.isDirectory()) filePath = path.join(filePath, 'index.html');
-    const data = await readFile(filePath);
+    const info = await stat(realFilePath);
+    if (info.isDirectory()) realFilePath = path.join(realFilePath, 'index.html');
+    const data = await readFile(realFilePath);
     res.writeHead(200);
     res.end(data);
   } catch (err) {
