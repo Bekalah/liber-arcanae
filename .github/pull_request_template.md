@@ -1,8 +1,0 @@
-- [ ] Ran ./scripts/check.sh → OK
-- [ ] Added node(s) to data/nodes/ + registry.json
-- [ ] Added provenance_id to provenance.json
-- [ ] Extended correspondences.json without breaking schema
-- [ ] JSON valid (LF, no smart quotes/tabs)
-- [ ] ND-safe confirmed (no autoplay/strobe)
-- [ ] Layered art preserved
-- [ ] No .github/workflows/ added
