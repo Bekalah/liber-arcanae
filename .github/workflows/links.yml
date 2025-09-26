@@ -1,6 +1,4 @@
 name: links
-permissions:
-  contents: read
 on:
   schedule:
     - cron: '0 3 * * *'
