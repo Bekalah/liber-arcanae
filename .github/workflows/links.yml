@@ -1,4 +1,6 @@
 name: links
+permissions:
+  contents: read
 on:
   schedule:
     - cron: '0 3 * * *'
@@ -8,6 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: lycheeverse/lychee-action@v1
+      - uses: lycheeverse/lychee-action@v2.0.2
         with:
           args: --no-progress --accept=200,206 .
