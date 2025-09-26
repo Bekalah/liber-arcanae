@@ -1,0 +1,36 @@
+app = "liber-arcanae-logs"
+primary_region = "ord"   # pick a region near you
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+  CORS_ALLOW_ORIGIN = "https://bekalah.github.io"
+  LOG_SALT = "change-me-to-a-long-random-string"
+
+[[services]]
+  internal_port = 8080
+  processes = ["app"]
+  protocol = "tcp"
+  [services.concurrency]
+    hard_limit = 50
+    soft_limit = 25
+    type = "connections"
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    grace_period = "10s"
+    interval = "15s"
+    timeout = "2s"
+
+[mounts]
+  source = "logs"
+  destination = "/data"
