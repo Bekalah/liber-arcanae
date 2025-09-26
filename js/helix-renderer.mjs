@@ -98,7 +98,6 @@ function drawTreeOfLife(ctx, width, height, nodeColor, lineColor, NUM) {
   ctx.globalAlpha = 0.55;
 
 
-  ND-safe static renderer for layered sacred geometry. No animation, calm palette, ordered layers.
   Pure functions honor numerology constants (3, 7, 9, 11, 22, 33, 99, 144) and preserve depth without motion.
 */
 
