@@ -7,9 +7,12 @@
 
 import http from "http";
 import {promises as fs} from "fs";
-import {resolve, join} from "path";
+import {resolve, join, sep} from "path";
 
-const root = resolve(process.argv[2] || "..");
+let root = resolve(process.argv[2] || "..");
+if (!root.endsWith(sep)) {
+  root = root + sep;
+}
 const types = {
   ".html":"text/html",
   ".js":"text/javascript",
@@ -28,7 +31,7 @@ const server = http.createServer(async (req, res) => {
   try {
     const realPath = await fs.realpath(requestedPath);
     // Check that the resolved path is contained within root
-    if (!realPath.startsWith(root)) {
+    if (!(realPath === root.slice(0, -1) || realPath.startsWith(root))) {
       res.writeHead(403, {"Content-Type":"text/plain"});
       res.end("Forbidden");
       return;
