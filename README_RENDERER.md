@@ -1,25 +1,20 @@
-Per Texturas Numerorum, Spira Loquitur.
-
 # Cosmic Helix Renderer
 
-Static, ND-safe HTML5 canvas renderer for layered sacred geometry. Open [index.html](./index.html) directly in any modern browser; no build tools, servers, or workflows are required.
+Static, ND-safe HTML5 canvas renderer for layered sacred geometry. Open [`index.html`](./index.html) directly in any modern browser; no build tools, servers, or workflows are required.
 
 ## Layer Order (depth preserved)
-1. **Vesica field** — intersecting circles on a triadic grid.
+1. **Vesica field** — intersecting circles on a triadic-by-heptadic grid to seed the field.
 2. **Tree-of-Life scaffold** — ten sephirot with twenty-two connecting paths.
 3. **Fibonacci curve** — fixed logarithmic spiral honoring natural growth.
-4. **Double-helix lattice** — two phase-shifted strands bound by calm crossbars.
+4. **Double-helix lattice** — two phase-shifted strands bound by gentle crossbars.
 
-Each layer draws with the next tone from [`data/palette.json`](./data/palette.json). If that file is absent, the page reports a gentle inline notice and renders with a built-in fallback palette so the geometry remains visible.
+Each layer draws with the next tone from [`data/palette.json`](./data/palette.json). If that file is absent, the page reports a calm inline notice and renders with a built-in fallback palette so the geometry remains visible.
 
 ## Numerology as Geometry Grammar
 The routines respect the requested constants: **3**, **7**, **9**, **11**, **22**, **33**, **99**, and **144**. They govern grid counts, spacing, and sample steps so the output stays faithful to the Cathedral canon while remaining static.
 
-## Local Use (offline)
-1. Double-click [index.html](./index.html).
-2. The 1440×900 canvas renders immediately, pulling data only from local files.
-3. Optional: adjust hues in [`data/palette.json`](./data/palette.json) while keeping six calm tones (`bg`, `ink`, and four-or-more `layers`).
 
+Highlights:
 - **21 pillars** – a Fibonacci node (8 + 13) aligning to Tarot majors and 21 Taras.
 - **33 spine** – triple elevens forming the Christic ladder.
 - **72 Shem angels/demons** – lunar decan cycle (8 × 9).
@@ -28,23 +23,37 @@ The routines respect the requested constants: **3**, **7**, **9**, **11**, **22*
 - **144 lattice** – perfect square of 12 and 8th Fibonacci.
 - **243 completion** – fivefold power of the triad (3⁵).
 
-Geometry routines in this renderer reference sacred numbers 3, 7, 9, 11, 22, 33, 99, and 144 to keep proportions meaningful while staying static.
+Geometry routines in this renderer reference sacred numbers to keep proportions meaningful while staying static and offline.
 
-## Local Use
-Double-click [index.html](./index.html) in any modern browser. The 1440×900 canvas renders immediately with no network calls.
-The renderer depends on [`js/helix-renderer.mjs`](./js/helix-renderer.mjs) and optional [`data/palette.json`](./data/palette.json).
-Everything runs offline. The Pantheon atlas at the top of the page remains intact; the helix canvas sits beneath the node catalogue and shares the Calm Mode toggle for consistent softening.
+Key correspondences:
+- **3** — Vesica rows and the spiral's rotational cadence.
+- **7** — Vesica columns and harmonic spacing.
+- **9** — Spiral rotations and calming completion.
+- **11** — Vesica margins and helix amplitude.
+- **22** — Tree paths and helix crossbars.
+- **33** — Helix strand segments anchoring the spine.
+- **99** — Spiral samples and node radii scaling.
+- **144** — Spiral radius seed derived from the sacred square.
+
+
+## Local Use (offline)
+1. Double-click [`index.html`](./index.html).
+2. The 1440×900 canvas renders immediately, pulling data only from local files.
+
+3. Optional: adjust hues in [`data/palette.json`](./data/palette.json) while keeping six calm tones (`bg`, `ink`, and at least four `layers`).
 
 ## ND-safe Notes
 - No motion or flashing; all elements render statically in layer order.
-- Palette uses gentle contrast for readability, with Calm Mode softening hues when toggled or when the OS requests reduced motion. Status text clarifies when fallbacks are engaged.
-- Skip link, `<main>` landmark, and status messaging keep the page navigable by keyboard and assistive tech.
-- Pure functions, ES modules, UTF-8, and LF newlines.
-- Palette file can be edited offline to adjust hues; the page falls back to built-in colors if it's missing and surfaces a small inline notice.
+- Palette uses gentle contrast for readability; fallback stays within the same tonal family.
+- Status text clarifies when fallbacks are engaged.
+- Pure functions, ES modules, ASCII quotes, UTF-8, and LF newlines.
+- Palette file can be edited offline to adjust hues; the page falls back to built-in colors if it is missing and surfaces a small inline notice.
 
+3. Optional: adjust hues in [`data/palette.json`](./data/palette.json) while keeping calm tones (`bg`, `ink`, and an array of `layers`).
 
-## ND-safe Guarantees
-- No animation, autoplay, flashes, or motion scripting—`renderHelix` runs once per load.
-- Gentle contrast palette with clear outlines; fallback stays within the same tonal family.
-- Inline comments document why layer order, numerology, and calm defaults are preserved.
-- Pure ES modules, ASCII quotes, UTF-8, LF newlines, and small focused functions.
+## ND-safe Notes
+- No motion or flashing; `renderHelix` runs once per load.
+- Palette uses gentle contrast for readability; fallback stays within the same tonal family and sets a small inline notice.
+- Comments in [`js/helix-renderer.mjs`](./js/helix-renderer.mjs) document the ND-safe reasoning and numerology per layer.
+- Pure ES modules, ASCII quotes, UTF-8, and LF newlines keep the code approachable offline.
+
