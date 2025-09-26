@@ -1,4 +1,6 @@
 name: lighthouse
+permissions:
+  contents: read
 on:
   pull_request:
   workflow_dispatch:
