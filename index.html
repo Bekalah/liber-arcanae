@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Liber Arcanae — Codex Abyssiae</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="assets/css/cathedral.css" />
+  <meta name="color-scheme" content="dark">
+</head>
+<body>
+  <header class="mast">
+    <h1 class="title">LIBER ARCANAE</h1>
+    <p class="subtitle">Codex Abyssiae — living corridors & playable arcana</p>
+  </header>
+
+  <main id="cathedral-root" aria-label="Interactive Cathedral Corridor">
+    <noscript>This corridor is interactive. Enable JavaScript to walk the nave.</noscript>
+    <div id="ui" role="group" aria-label="Controls">
+      <div class="ui-row">
+        <button id="motionToggle" class="btn" aria-pressed="false">Reduce Motion: OFF</button>
+        <a class="btn" href="arcana.html?id=fool">Quick Start: The Fool</a>
+        <a class="btn" href="https://bekalah.github.io" target="_blank" rel="noopener">Cathedral</a>
+      </div>
+      <div class="legend"><span class="dot"></span>Click/Space walk • Drag look • Doors glow when near</div>
+    </div>
+  </main>
+
+  <!-- Three.js -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"></script>
+  <script type="module" src="assets/js/engines/nave-corridor.js"></script>
+</body>
+</html>

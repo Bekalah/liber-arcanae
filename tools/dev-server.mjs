@@ -7,9 +7,12 @@
 
 import http from "http";
 import {promises as fs} from "fs";
-import {resolve, join} from "path";
+import {resolve, join, sep} from "path";
 
-const root = resolve(process.argv[2] || "..");
+let root = resolve(process.argv[2] || "..");
+if (!root.endsWith(sep)) {
+  root = root + sep;
+}
 const types = {
   ".html":"text/html",
   ".js":"text/javascript",
@@ -24,10 +27,17 @@ const types = {
 
 const server = http.createServer(async (req, res) => {
   const urlPath = decodeURIComponent(req.url.split("?")[0]);
-  const filePath = join(root, urlPath);
+  const requestedPath = resolve(root, "." + urlPath); // ensure urlPath is always below root (prevents absolute path & traversal)
   try {
-    const data = await fs.readFile(filePath);
-    const ext = filePath.substring(filePath.lastIndexOf("."));
+    const realPath = await fs.realpath(requestedPath);
+    // Check that the resolved path is contained within root
+    if (!(realPath === root.slice(0, -1) || realPath.startsWith(root))) {
+      res.writeHead(403, {"Content-Type":"text/plain"});
+      res.end("Forbidden");
+      return;
+    }
+    const data = await fs.readFile(realPath);
+    const ext = realPath.substring(realPath.lastIndexOf("."));
     res.writeHead(200, {"Content-Type": types[ext] || "application/octet-stream"});
     res.end(data);
   } catch (err) {
