@@ -13,47 +13,23 @@ Each layer draws with the next tone from [`data/palette.json`](./data/palette.js
 ## Numerology as Geometry Grammar
 The routines respect the requested constants: **3**, **7**, **9**, **11**, **22**, **33**, **99**, and **144**. They govern grid counts, spacing, and sample steps so the output stays faithful to the Cathedral canon while remaining static.
 
-
-Highlights:
-- **21 pillars** – a Fibonacci node (8 + 13) aligning to Tarot majors and 21 Taras.
-- **33 spine** – triple elevens forming the Christic ladder.
-- **72 Shem angels/demons** – lunar decan cycle (8 × 9).
-- **78 archetypes** – complete Tarot weave (22 + 56).
-- **99 gates** – threefold expansion of the spine (3 × 33).
-- **144 lattice** – perfect square of 12 and 8th Fibonacci.
-- **243 completion** – fivefold power of the triad (3⁵).
-
-Geometry routines in this renderer reference sacred numbers to keep proportions meaningful while staying static and offline.
-
 Key correspondences:
-- **3** — Vesica rows and the spiral's rotational cadence.
-- **7** — Vesica columns and harmonic spacing.
-- **9** — Spiral rotations and calming completion.
-- **11** — Vesica margins and helix amplitude.
-- **22** — Tree paths and helix crossbars.
-- **33** — Helix strand segments anchoring the spine.
-- **99** — Spiral samples and node radii scaling.
-- **144** — Spiral radius seed derived from the sacred square.
-
+- **3** — Vesica rows, spiral center proportions, and helix phase shift.
+- **7** — Vesica columns and calm heptadic rhythms in the lattice.
+- **9** — Spiral rotations and helix step cadence for gentle completion.
+- **11** — Margins, helix amplitude, and golden-ratio offsets.
+- **22** — Tree paths, Fibonacci growth exponent, and helix crossbars.
+- **33** — Strand segments that anchor the lattice vertically.
+- **99** — Stroke scales for Vesica and node radii, preventing glare.
+- **144** — Canvas aspect (1440 width) and spiral sample count for detail without motion.
 
 ## Local Use (offline)
 1. Double-click [`index.html`](./index.html).
 2. The 1440×900 canvas renders immediately, pulling data only from local files.
-
-3. Optional: adjust hues in [`data/palette.json`](./data/palette.json) while keeping six calm tones (`bg`, `ink`, and at least four `layers`).
-
-## ND-safe Notes
-- No motion or flashing; all elements render statically in layer order.
-- Palette uses gentle contrast for readability; fallback stays within the same tonal family.
-- Status text clarifies when fallbacks are engaged.
-- Pure functions, ES modules, ASCII quotes, UTF-8, and LF newlines.
-- Palette file can be edited offline to adjust hues; the page falls back to built-in colors if it is missing and surfaces a small inline notice.
-
-3. Optional: adjust hues in [`data/palette.json`](./data/palette.json) while keeping calm tones (`bg`, `ink`, and an array of `layers`).
+3. Optional: adjust hues in [`data/palette.json`](./data/palette.json) while keeping six calm tones (`bg`, `ink`, and an array of `layers`).
 
 ## ND-safe Notes
-- No motion or flashing; `renderHelix` runs once per load.
-- Palette uses gentle contrast for readability; fallback stays within the same tonal family and sets a small inline notice.
-- Comments in [`js/helix-renderer.mjs`](./js/helix-renderer.mjs) document the ND-safe reasoning and numerology per layer.
+- No motion or flashing; `renderHelix` runs once per load and draws in a fixed order.
+- Palette uses gentle contrast for readability; fallback stays within the same tonal family and surfaces a small inline notice.
+- Comments in [`js/helix-renderer.mjs`](./js/helix-renderer.mjs) document ND-safe reasoning and numerology per layer.
 - Pure ES modules, ASCII quotes, UTF-8, and LF newlines keep the code approachable offline.
-
